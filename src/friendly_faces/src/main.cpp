@@ -1,8 +1,6 @@
 #include <string>
-#include <unordered_map>
 #include <algorithm>
 
-#include <time.h>
 #include <stdio.h>
 
 #include "opencv2/opencv.hpp"
@@ -11,15 +9,14 @@
 #include "ff_text/positioning.h"
 #include "ff_db/storage.h"
 #include "ff_proc/image_proc.h"
+#include "ff_proc/frame_proc.h"
+#include "ff_monitor/fps.h"
 
 using namespace cv;
 using namespace std;
 using namespace ros;
 
 void run() {
-	printf("CXX Standard:   %li\n", __cplusplus);
-	printf("OpenCV Version: %s\n", CV_VERSION);
-
 	VideoCapture stream(0);
 	if (!stream.isOpened()) {
 		printf("cannot open camera\n");
@@ -28,33 +25,14 @@ void run() {
 
 	loadPresets();
 
-	CascadeClassifier face_cascade;
+	FFFrameProcessor frame_proc;
 
-	if (!face_cascade.load("res/haarcascade_frontalface_alt.xml")) {
-		printf("error loading face cascade\n");
-		return;
-	}
-
-	int fps;
-	int frames;
-	time_t start, end;
-	time(&start);
+	FPSCounter fps;
 
 	Mat frame;
-	Mat process;
 	Mat face(250, 250, CV_8UC3);
 	while (stream.read(frame)) {
-		process = frame.clone();
-		resize(process, process, Size(160, 120));
-
-		medianBlur(process, process, 3);
-
-		vector<Rect> faces;
-		Mat frame_gray;
-		cvtColor(process, frame_gray, COLOR_BGR2GRAY);
-		equalizeHist(frame_gray, frame_gray);
-
-		face_cascade.detectMultiScale(frame_gray, faces);
+		vector<Rect> faces = frame_proc.process(frame);
 
 		if (!faces.empty()) {
 			for (int i = 0; i < faces.size(); i++) {
@@ -80,16 +58,9 @@ void run() {
 			reset();
 		}
 
-		frames++;
-		time(&end);
+		fps.frame();
 
-		if (difftime(end, start) >= 1) {
-			time(&start);
-			fps = frames;
-			frames = 0;
-		}
-
-		text(frame, to_string(fps).c_str(), Point(0, frame.size().height - 5));
+		text(frame, to_string(fps.getFPS()).c_str(), Point(0, frame.size().height - 5));
 		imshow("cam", frame);
 
 		if (waitKey(10) >= 0) {
@@ -103,6 +74,10 @@ void run() {
 
 int main(int argc, char** argv) {
 	init(argc, argv, "project_node");
+
+	printf("CXX Standard:   %li\n", __cplusplus);
+	printf("OpenCV Version: %s\n", CV_VERSION);
+
 	run();
 	return 0;
 }

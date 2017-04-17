@@ -23,17 +23,24 @@ void run() {
 		return;
 	}
 
-	loadPresets();
-
 	FFFrameProcessor frame_proc;
 
 	FPSCounter fps;
+
+	int lastFaces = 0;
+	bool action = false;
 
 	Mat frame;
 	Mat face(250, 250, CV_8UC3);
 	while (stream.read(frame)) {
 		vector<Rect> faces = frame_proc.process(frame);
 
+		if (lastFaces != faces.size()) {
+			lastFaces = faces.size();
+			action = true;
+		} else {
+			action = false;
+		}
 		if (!faces.empty()) {
 			for (int i = 0; i < faces.size(); i++) {
 				Point p1(faces[i].x, faces[i].y);
@@ -49,8 +56,19 @@ void run() {
 
 				string name;
 				if ((name = findFriend(face)).size() != 0) {
-					printf("found %s\n", name.c_str());
+					if (action) {
+						printf("hi there %s, you look good today\n", name.c_str());
+					}
+				} else {
+					imshow("stranger", face);
+					waitKey(100);
+					printf("What's your name stranger?\n");
+					cin >> name;
+					destroyWindow("stranger");
 				}
+
+				learn(name, face);
+				face = getDB(name);
 
 				frameText(frame, name.c_str(), faceRect);
 				rectangle(frame, faceRect, Scalar(0, 255, 0));
@@ -62,6 +80,7 @@ void run() {
 
 		text(frame, to_string(fps.getFPS()).c_str(), Point(0, frame.size().height - 5));
 		imshow("cam", frame);
+		imshow("face", face);
 
 		if (waitKey(10) >= 0) {
 			break;

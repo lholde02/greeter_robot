@@ -8,7 +8,9 @@
 using namespace cv;
 using namespace std;
 
-void loadPresets();
+void learn(string name, Mat face);
+
+Mat getDB(string name);
 
 string findFriend(Mat frame);
 

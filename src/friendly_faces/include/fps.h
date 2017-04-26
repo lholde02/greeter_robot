@@ -1,5 +1,4 @@
-#ifndef FF_FPS_H
-#define FF_FPS_H
+#pragma once
 
 #include <time.h>
 
@@ -14,5 +13,3 @@ public:
 	void frame();
 	double getFPS();
 };
-
-#endif

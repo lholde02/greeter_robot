@@ -1,4 +1,4 @@
-#include "ff_proc/frame_proc.h"
+#include "image_proc.h"
 
 FFFrameProcessor::FFFrameProcessor() {
 	if (!face_cascade.load("res/haarcascade_frontalface_alt.xml")) {
@@ -22,4 +22,14 @@ vector<Rect> FFFrameProcessor::process(Mat frame) {
 	face_cascade.detectMultiScale(frame_gray, faces);
 
 	return faces;
+}
+
+double frameCompare(Mat frame1, Mat frame2) {
+	if (frame1.rows <= 0 || frame1.rows != frame2.rows || frame2.cols <= 0 || frame2.cols != frame2.cols) {
+		return -1;
+	}
+
+	double error = norm(frame1, frame2, CV_L1);
+	error /= frame1.rows * frame1.cols;
+	return error;
 }

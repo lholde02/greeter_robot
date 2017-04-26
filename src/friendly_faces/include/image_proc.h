@@ -1,5 +1,4 @@
-#ifndef FF_FRAME_PROC_H
-#define FF_FRAME_PROC_H
+#pragma once
 
 #include <vector>
 
@@ -17,4 +16,4 @@ public:
 	vector<Rect> process(Mat frame);
 };
 
-#endif
+double frameCompare(Mat frame1, Mat frame2);

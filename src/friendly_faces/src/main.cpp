@@ -6,11 +6,10 @@
 #include "opencv2/opencv.hpp"
 #include "ros/ros.h"
 
-#include "ff_text/positioning.h"
-#include "ff_db/storage.h"
-#include "ff_proc/image_proc.h"
-#include "ff_proc/frame_proc.h"
-#include "ff_monitor/fps.h"
+#include "text.h"
+#include "storage.h"
+#include "image_proc.h"
+#include "fps.h"
 
 using namespace cv;
 using namespace std;
@@ -31,16 +30,39 @@ void run() {
 	bool action = false;
 
 	Mat frame;
-	Mat face(250, 250, CV_8UC3);
+	Mat faceMat(250, 250, CV_8UC3);
 	while (stream.read(frame)) {
 		vector<Rect> faces = frame_proc.process(frame);
 
 		if (lastFaces != faces.size()) {
+			action = faces.size() > lastFaces;
 			lastFaces = faces.size();
-			action = true;
 		} else {
 			action = false;
 		}
+		if (action) {
+			printf("action\n");
+		}
+
+		int strangers = 0;
+		int friends = 0;
+		for (auto face : faces) {
+			Point p1(face.x, face.y);
+			Point p2(face.x + face. width, face.y + face.height);
+			p1.x *= 4;
+			p1.y *= 4;
+			p2.x *= 4;
+			p2.y *= 4;
+			Rect faceRect(p1, p2);
+
+			faceMat = frame(faceRect).clone();
+
+			string name = findFriend(faceMat);
+			strangers += name.size() == 0;
+			friends += name.size() != 0;
+		}
+		printf("friends: %d\nstrangers:%d\n\n", friends, strangers);
+/*
 		if (!faces.empty()) {
 			for (int i = 0; i < faces.size(); i++) {
 				Point p1(faces[i].x, faces[i].y);
@@ -75,19 +97,18 @@ void run() {
 			}
 			reset();
 		}
+*/
 
 		fps.frame();
 
 		text(frame, to_string(fps.getFPS()).c_str(), Point(0, frame.size().height - 5));
 		imshow("cam", frame);
-		imshow("face", face);
 
 		if (waitKey(10) >= 0) {
 			break;
 		}
 		spinOnce();
 	}
-
 	destroyWindow("cam");
 }
 

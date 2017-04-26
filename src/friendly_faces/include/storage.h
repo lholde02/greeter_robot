@@ -1,5 +1,4 @@
-#ifndef STORAGE_H
-#define STORAGE_H
+#pragma once
 
 #include <string>
 
@@ -15,6 +14,3 @@ Mat getDB(string name);
 string findFriend(Mat frame);
 
 void reset();
-
-
-#endif

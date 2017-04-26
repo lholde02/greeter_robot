@@ -13,11 +13,10 @@ catkin_package(INCLUDE_DIRS include/)
 include_directories(include/ ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 add_executable(friendly_face_runner
-	src/ff_db/storage.cpp
-	src/ff_monitor/fps.cpp
-	src/ff_proc/image_proc.cpp
-	src/ff_proc/frame_proc.cpp
-	src/ff_text/positioning.cpp
+	src/storage.cpp
+	src/fps.cpp
+	src/image_proc.cpp
+	src/text.cpp
 	src/main.cpp
 )
 target_link_libraries(friendly_face_runner ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

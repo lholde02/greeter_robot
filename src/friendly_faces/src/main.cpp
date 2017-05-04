@@ -34,70 +34,32 @@ void run() {
 	while (stream.read(frame)) {
 		vector<Rect> faces = frame_proc.process(frame);
 
-		if (lastFaces != faces.size()) {
-			action = faces.size() > lastFaces;
-			lastFaces = faces.size();
-		} else {
-			action = false;
-		}
-		if (action) {
-			printf("action\n");
-		}
-
-		int strangers = 0;
-		int friends = 0;
-		for (auto face : faces) {
-			Point p1(face.x, face.y);
-			Point p2(face.x + face. width, face.y + face.height);
-			p1.x *= 4;
-			p1.y *= 4;
-			p2.x *= 4;
-			p2.y *= 4;
-			Rect faceRect(p1, p2);
-
-			faceMat = frame(faceRect).clone();
-
-			string name = findFriend(faceMat);
-			strangers += name.size() == 0;
-			friends += name.size() != 0;
-		}
-		printf("friends: %d\nstrangers:%d\n\n", friends, strangers);
-/*
-		if (!faces.empty()) {
 			for (int i = 0; i < faces.size(); i++) {
-				Point p1(faces[i].x, faces[i].y);
-				Point p2(faces[i].x + faces[i]. width, faces[i].y + faces[i].height);
-				p1.x *= 4;
-				p1.y *= 4;
-				p2.x *= 4;
-				p2.y *= 4;
-				Rect faceRect(p1, p2);
+				rectangle(frame, faces[i], Scalar(0, 255, 0));
+/*
+			face = frame(faceRect).clone();
+			resize(face, face, Size(250, 250));
 
-				face = frame(faceRect).clone();
-				resize(face, face, Size(250, 250));
-
-				string name;
-				if ((name = findFriend(face)).size() != 0) {
-					if (action) {
-						printf("hi there %s, you look good today\n", name.c_str());
-					}
-				} else {
-					imshow("stranger", face);
-					waitKey(100);
-					printf("What's your name stranger?\n");
-					cin >> name;
-					destroyWindow("stranger");
+			string name;
+			if ((name = findFriend(face)).size() != 0) {
+				if (action) {
+					printf("hi there %s, you look good today\n", name.c_str());
 				}
-
-				learn(name, face);
-				face = getDB(name);
-
-				frameText(frame, name.c_str(), faceRect);
-				rectangle(frame, faceRect, Scalar(0, 255, 0));
+			} else {
+				imshow("stranger", face);
+				waitKey(100);
+				printf("What's your name stranger?\n");
+				cin >> name;
+				destroyWindow("stranger");
 			}
-			reset();
-		}
+
+			learn(name, face);
+			face = getDB(name);
+
+			frameText(frame, name.c_str(), faceRect);
 */
+		}
+		//reset();
 
 		fps.frame();
 

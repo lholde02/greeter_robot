@@ -1,8 +1,13 @@
 #include "opencv2/opencv.hpp"
 
+#include "ros/ros.h"
+#include "sound_play/sound_play.h"
+
 #include "text.h"
 
 using namespace cv;
+using namespace ros;
+using namespace sound_play;
 
 void text(Mat frame, const char* str, Point pt) {
 	putText(frame, str, pt, FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 255, 0));

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 #include "opencv2/opencv.hpp"
 
@@ -13,7 +14,7 @@ private:
 public:
 	FFFrameProcessor();
 
-	vector<Rect> process(Mat frame);
+	vector<pair<Rect, string>> process(Mat frame);
 };
 
 double frameCompare(Mat frame1, Mat frame2);

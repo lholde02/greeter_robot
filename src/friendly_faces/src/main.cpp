@@ -6,6 +6,8 @@
 #include "opencv2/opencv.hpp"
 #include "ros/ros.h"
 
+#include "sound_play/sound_play.h"
+
 #include "text.h"
 #include "storage.h"
 #include "image_proc.h"
@@ -14,8 +16,11 @@
 using namespace cv;
 using namespace std;
 using namespace ros;
+using namespace sound_play;
 
 void run() {
+	//system("rosrun sound_play say.py 'hello world'");
+
 	VideoCapture stream(0);
 	if (!stream.isOpened()) {
 		printf("cannot open camera\n");
@@ -26,40 +31,30 @@ void run() {
 
 	FPSCounter fps;
 
-	int lastFaces = 0;
-	bool action = false;
-
 	Mat frame;
-	Mat faceMat(250, 250, CV_8UC3);
+	Mat face;
 	while (stream.read(frame)) {
-		vector<Rect> faces = frame_proc.process(frame);
+		vector<pair<Rect, string>> faces = frame_proc.process(frame);
 
-			for (int i = 0; i < faces.size(); i++) {
-				rectangle(frame, faces[i], Scalar(0, 255, 0));
-/*
-			face = frame(faceRect).clone();
-			resize(face, face, Size(250, 250));
+		for (auto elem : faces) {
+			rectangle(frame, elem.first, Scalar(0, 255, 0));
 
-			string name;
-			if ((name = findFriend(face)).size() != 0) {
-				if (action) {
-					printf("hi there %s, you look good today\n", name.c_str());
-				}
-			} else {
+			face = frame(elem.first).clone();
+			string name = elem.second;
+			if (name.size() == 0) {
 				imshow("stranger", face);
-				waitKey(100);
+				waitKey(25);
 				printf("What's your name stranger?\n");
 				cin >> name;
 				destroyWindow("stranger");
 			}
-
 			learn(name, face);
-			face = getDB(name);
-
-			frameText(frame, name.c_str(), faceRect);
-*/
+			frameText(frame, name.c_str(), elem.first);
 		}
-		//reset();
+
+		if (!getDB().empty()) {
+			imshow("face", getDB().begin()->second);
+		}
 
 		fps.frame();
 
@@ -75,7 +70,7 @@ void run() {
 }
 
 int main(int argc, char** argv) {
-	init(argc, argv, "project_node");
+	init(argc, argv, "friendly_faces_runner");
 
 	printf("CXX Standard:   %li\n", __cplusplus);
 	printf("OpenCV Version: %s\n", CV_VERSION);

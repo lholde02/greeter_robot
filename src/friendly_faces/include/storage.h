@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 #include "opencv2/opencv.hpp"
 
@@ -9,7 +10,7 @@ using namespace std;
 
 void learn(string name, Mat face);
 
-Mat getDB(string name);
+unordered_map<string, Mat> getDB();
 
 string findFriend(Mat frame);
 

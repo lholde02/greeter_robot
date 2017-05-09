@@ -1,32 +1,36 @@
 #include "storage.h"
 
 #include <vector>
-#include <unordered_map>
 
 #include "image_proc.h"
 
 vector<string> used;
 unordered_map<string, Mat> db;
 
-void learn(string name, Mat face) {
+void learn(string name, Mat _face) {
+	Mat face = _face.clone();
+	resize(face, face, Size(160, 120));
 	if (db[name].empty()) {
 		db[name] = face;
 	} else {
-		addWeighted(face, .10, db[name], .90, 0.0, db[name]);
+		addWeighted(face, .05, db[name], .95, 0.0, db[name]);
 	}
 }
 
-Mat getDB(string name) {
-	return db[name];
+unordered_map<string, Mat> getDB() {
+	return db;
 }
 
-string findFriend(Mat frame) {
+string findFriend(Mat _face) {
+	Mat face = _face.clone();
+	resize(face, face, Size(160, 120));
 	for (auto item : db) {
 		if (find(used.begin(), used.end(), item.first) != used.end()) {
 			continue;
 		}
-		double compare = frameCompare(db[item.first], frame);
-		if (compare < 60) {
+		double compare = frameCompare(item.second, face);
+		printf("compare to %s: %f\n", item.first.c_str(), compare);
+		if (compare < 100) {
 			return item.first;
 		}
 	}

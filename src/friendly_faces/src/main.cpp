@@ -58,6 +58,7 @@ bool run(Mat frame) {
 			stranger = true;
 			imshow("stranger", face);
 			waitKey(25);
+			client->say("Hello stranger, what is your name?");
 			printf("What's your name stranger?\n");
 			cin >> name;
 			destroyWindow("stranger");
@@ -133,13 +134,16 @@ private:
 			printf("idling\n");
 		}
 	}
-
 public:
 	SegbotProcessor(NodeHandle& nh) : it(nh) {
 		processing = true;
 		image_sub = it.subscribe("/nav_kinect/rgb/image_raw", 1, &SegbotProcessor::callback, this);
 
 		ac = new SimpleActionClient<MoveBaseAction>("move_base", true);
+	}
+	
+	~SegbotProcessor() {
+		free(ac);
 	}
 
 	void go(float x, float y, float z, float yaw) {
@@ -185,8 +189,9 @@ int main(int argc, char** argv) {
 	NodeHandle nh;
 	client = new SoundClient;
 
-	launch();
-	//SegbotProcessor sp();
+	//launch();
+	SegbotProcessor sp(nh);
+	spin();
 	destroyWindow("cam");
 
 	free(client);

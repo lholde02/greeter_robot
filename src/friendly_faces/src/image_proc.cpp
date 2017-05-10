@@ -13,7 +13,7 @@ vector<pair<Rect, string>> FFFrameProcessor::process(Mat frame) {
 	vector<Rect> FR_faces;
 
 	Mat process;
-	resize(frame, process, Size(160, 120));
+	resize(frame, process, Size(320, 240));
 	medianBlur(process, process, 3);
 
 	Mat frame_gray;
@@ -23,10 +23,10 @@ vector<pair<Rect, string>> FFFrameProcessor::process(Mat frame) {
 	face_cascade.detectMultiScale(frame_gray, FR_faces);
 
 	for_each(FR_faces.begin(), FR_faces.end(), [](Rect& faceRect){
-		faceRect.x *= 4;
-		faceRect.y *= 4;
-		faceRect.width *= 4;
-		faceRect.height *= 4;
+		faceRect.x *= 2;
+		faceRect.y *= 2;
+		faceRect.width *= 2;
+		faceRect.height *= 2;
 	});
 
 	vector<pair<Rect, string>> pairing;

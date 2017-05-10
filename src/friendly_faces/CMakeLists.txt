@@ -3,9 +3,9 @@ project(friendly_faces)
 
 add_definitions(-std=c++11)
 
+find_package(OpenCV REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
 	roscpp
-	OpenCV
 	sound_play
 	cv_bridge
 	image_transport

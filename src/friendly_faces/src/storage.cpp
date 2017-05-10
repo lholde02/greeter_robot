@@ -9,7 +9,7 @@ unordered_map<string, Mat> db;
 
 void learn(string name, Mat _face) {
 	Mat face = _face.clone();
-	resize(face, face, Size(160, 120));
+	resize(face, face, Size(320, 240));
 	if (db[name].empty()) {
 		db[name] = face;
 	} else {
@@ -23,7 +23,7 @@ unordered_map<string, Mat> getDB() {
 
 string findFriend(Mat _face) {
 	Mat face = _face.clone();
-	resize(face, face, Size(160, 120));
+	resize(face, face, Size(320, 240));
 	for (auto item : db) {
 		if (find(used.begin(), used.end(), item.first) != used.end()) {
 			continue;

@@ -75,7 +75,7 @@ bool run(Mat frame) {
 	if (prevFaces.size() != faces.size() && !stranger) {
 		for (auto elem : faces) {
 			if (!vector_contains(prevFaces, elem)) {
-	    			//elem in faces that's not in prevFaces
+	    		//elem in faces that's not in prevFaces
 				//someone entered
 				printf("entered frame: %s\n", elem.second.c_str());
 
@@ -94,6 +94,7 @@ bool run(Mat frame) {
 			}
 		}
 	}
+	printf("hi\n");
 
 	idle = prevFaces.size() == faces.size() && faces.size() == 0;
 
@@ -102,7 +103,7 @@ bool run(Mat frame) {
 	if (waitKey(10) >= 0) {
 		return true;
 	}
-	spinOnce();
+	//spinOnce();
 	return false;
 }
 
@@ -132,6 +133,7 @@ private:
 
 		if (idle) {
 			printf("idling\n");
+			go(0.5, 0, 0, 0);
 		}
 	}
 public:

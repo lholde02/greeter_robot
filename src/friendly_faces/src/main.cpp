@@ -151,7 +151,6 @@ public:
 	SegbotProcessor(NodeHandle& nh) : it(nh) {
 		processing = true;
 		image_sub = it.subscribe("/nav_kinect/rgb/image_raw", 1, &SegbotProcessor::callback, this);
-		//image_sub = it.subscribe("/camera/image_raw", 1, &SegbotProcessor::callback, this);
 
 		c = new SimpleActionClient<ExecutePlanAction>("action_executor/execute_plan", true);
 		c->waitForServer();
@@ -196,6 +195,7 @@ public:
 	}
 	
 	void _kill_idle() {
+		lastIdle = -1;
 		first = true;
 		
 		printf("cancelling goals\n");

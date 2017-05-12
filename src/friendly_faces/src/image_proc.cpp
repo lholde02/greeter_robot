@@ -8,13 +8,15 @@ FFFrameProcessor::FFFrameProcessor() {
 	}
 }
 
+int upscale;
+
 vector<pair<Rect, string>> FFFrameProcessor::process(Mat frame) {
+	upscale = frame.cols / 160;
 	//haar cascades
 	vector<Rect> FR_faces;
 
 	Mat process;
-	resize(frame, process, Size(320, 240));
-	medianBlur(process, process, 3);
+	resize(frame, process, Size(160, 120));
 
 	Mat frame_gray;
 	cvtColor(process, frame_gray, COLOR_BGR2GRAY);
@@ -23,10 +25,10 @@ vector<pair<Rect, string>> FFFrameProcessor::process(Mat frame) {
 	face_cascade.detectMultiScale(frame_gray, FR_faces);
 
 	for_each(FR_faces.begin(), FR_faces.end(), [](Rect& faceRect){
-		faceRect.x *= 2;
-		faceRect.y *= 2;
-		faceRect.width *= 2;
-		faceRect.height *= 2;
+		faceRect.x *= upscale;
+		faceRect.y *= upscale;
+		faceRect.width *= upscale;
+		faceRect.height *= upscale;
 	});
 
 	vector<pair<Rect, string>> pairing;

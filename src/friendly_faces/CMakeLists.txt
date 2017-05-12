@@ -14,9 +14,16 @@ find_package(catkin REQUIRED COMPONENTS
 	turtlesim
 	message_generation
 	geometry_msgs
-	actionlib)
+	actionlib
+	actionlib_msgs
+	bwi_kr_execution
+	bwi_msgs
+)
 
-catkin_package(INCLUDE_DIRS include/ ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+catkin_package(
+	INCLUDE_DIRS include/ ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}
+	CATKIN_DEPENDS actionlib bwi_msgs std_msgs
+)
 
 # BUILD
 
@@ -29,4 +36,5 @@ add_executable(friendly_faces_runner
 	src/text.cpp
 	src/main.cpp
 )
+add_dependencies(friendly_faces_runner ${catkin_EXPORTED_TARGETS})
 target_link_libraries(friendly_faces_runner ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

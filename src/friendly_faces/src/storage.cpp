@@ -30,7 +30,7 @@ string findFriend(Mat _face) {
 		}
 		double compare = frameCompare(item.second, face);
 		printf("compare to %s: %f\n", item.first.c_str(), compare);
-		if (compare < 200) {
+		if (compare < 175) {
 			used.push_back(item.first);
 			return item.first;
 		}

@@ -1,4 +1,4 @@
-#include <string>
+	#include <string>
 #include <algorithm>
 #include <stdio.h>
 
@@ -39,8 +39,8 @@ int greetings_sz = 4;
 string goodbyes[] = {"good bye", "see you later", "bye", "I'll miss you"};
 int goodbyes_sz = 4;
 
-string doors[] = {"d3_414b2"};//"d3_414b1", "d3_414a1", "d3_414a2"
-int doors_sz = 1;
+string doors[] = {"d3_414b1","d3_414b2", "d3_414a1", "d3_414a2"};
+int doors_sz = 4;
 
 //init
 SoundClient* client;
@@ -111,7 +111,6 @@ private:
 			learn(name, face);
 			frameText(frame, name.c_str(), elem.first);
 		}
-		reset();
 
 		fps.frame();
 

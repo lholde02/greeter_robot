@@ -2,7 +2,7 @@
 #include "storage.h"
 
 FFFrameProcessor::FFFrameProcessor() {
-	if (!face_cascade.load("res/lbpcascade_profileface.xml")) {
+	if (!face_cascade.load("res/haarcascade_frontalface_default.xml")) {
 		printf("error loading face cascade\n");
 		return;
 	}

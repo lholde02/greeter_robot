@@ -2,7 +2,7 @@
 #include "storage.h"
 
 FFFrameProcessor::FFFrameProcessor() {
-	if (!face_cascade.load("res/haarcascade_frontalface_alt.xml")) {
+	if (!face_cascade.load("res/haarcascade_frontalface_default.xml")) {
 		printf("error loading face cascade\n");
 		return;
 	}
@@ -22,7 +22,7 @@ vector<pair<Rect, string>> FFFrameProcessor::process(Mat frame) {
 	cvtColor(process, frame_gray, COLOR_BGR2GRAY);
 	equalizeHist(frame_gray, frame_gray);
 
-	face_cascade.detectMultiScale(frame_gray, FR_faces);
+	face_cascade.detectMultiScale(frame_gray, FR_faces, 1.1, 4, 0, Size(10, 10), Size(frame.cols / 3, frame.rows / 3));
 
 	for_each(FR_faces.begin(), FR_faces.end(), [](Rect& faceRect){
 		faceRect.x *= upscale;

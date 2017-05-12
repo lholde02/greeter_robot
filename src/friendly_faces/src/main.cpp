@@ -39,8 +39,8 @@ int greetings_sz = 4;
 string goodbyes[] = {"good bye", "see you later", "bye", "I'll miss you"};
 int goodbyes_sz = 4;
 
-string doors[] = {"d3_414b1", "d3_414b2"};//"d3_414a1", "d3_414a2"
-int doors_sz = 2;
+string doors[] = {"d3_414b2"};//"d3_414b1", "d3_414a1", "d3_414a2"
+int doors_sz = 1;
 
 //init
 SoundClient* client;
@@ -66,6 +66,7 @@ private:
 
 	void callback(const sensor_msgs::ImageConstPtr& msg) {
 		if (!processing) {
+			_kill_idle();
 			return;
 		}
 
@@ -110,6 +111,7 @@ private:
 			learn(name, face);
 			frameText(frame, name.c_str(), elem.first);
 		}
+		reset();
 
 		fps.frame();
 

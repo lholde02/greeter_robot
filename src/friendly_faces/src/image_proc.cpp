@@ -22,7 +22,7 @@ vector<pair<Rect, string>> FFFrameProcessor::process(Mat frame) {
 	cvtColor(process, frame_gray, COLOR_BGR2GRAY);
 	equalizeHist(frame_gray, frame_gray);
 
-	face_cascade.detectMultiScale(frame_gray, FR_faces, 1.1, 4, 0, Size(10, 10), Size(frame.cols / 3, frame.rows / 3));
+	face_cascade.detectMultiScale(frame_gray, FR_faces, 1.1, 4, 0 | CV_HAAR_SCALE_IMAGE, Size(10, 10), Size(frame.cols / 3, frame.rows / 3));
 
 	for_each(FR_faces.begin(), FR_faces.end(), [](Rect& faceRect){
 		faceRect.x *= upscale;

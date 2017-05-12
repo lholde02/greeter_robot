@@ -16,13 +16,11 @@ find_package(catkin REQUIRED COMPONENTS
 	geometry_msgs
 	actionlib
 	actionlib_msgs
-	bwi_kr_execution
-	bwi_msgs
 )
 
 catkin_package(
 	INCLUDE_DIRS include/ ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}
-	CATKIN_DEPENDS actionlib bwi_msgs std_msgs
+	CATKIN_DEPENDS actionlib std_msgs
 )
 
 # BUILD

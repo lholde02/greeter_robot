@@ -11,6 +11,7 @@ FFFrameProcessor::FFFrameProcessor() {
 int upscale;
 
 vector<pair<Rect, string>> FFFrameProcessor::process(Mat frame) {
+        printf("In process frame\n");
 	upscale = frame.cols / 160;
 	//haar cascades
 	vector<Rect> FR_faces;
@@ -22,7 +23,7 @@ vector<pair<Rect, string>> FFFrameProcessor::process(Mat frame) {
 	cvtColor(process, frame_gray, COLOR_BGR2GRAY);
 	equalizeHist(frame_gray, frame_gray);
 
-	face_cascade.detectMultiScale(frame_gray, FR_faces, 1.2, 4, CV_HAAR_SCALE_IMAGE, Size(10, 10), Size(frame.cols / 3, frame.rows / 3));
+	face_cascade.detectMultiScale(frame_gray, FR_faces, 1.1, 3, CV_HAAR_SCALE_IMAGE);
 
 	for_each(FR_faces.begin(), FR_faces.end(), [](Rect& faceRect){
 		faceRect.x *= upscale;

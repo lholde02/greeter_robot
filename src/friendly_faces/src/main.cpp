@@ -94,6 +94,37 @@ class SegbotProcessor {
   
       }
 
+	// Returns a new image that is a cropped version of the original image.
+	IplImage* FaceRecognitionLib::cropImage(const IplImage *img, const CvRect region)
+	{
+	    IplImage *imageTmp;
+	    IplImage *imageRGB;
+	    CvSize size;
+	    size.height = img->height;
+	    size.width = img->width;
+
+	    if (img->depth != IPL_DEPTH_8U) {
+		ROS_INFO("ERROR in cropImage: Unknown image depth of %d given in cropImage() instead of 8 bits per pixel.", img->depth);
+		exit(1);
+	    }
+
+	    // First create a new (color or greyscale) IPL Image and copy contents of img into it.
+	    imageTmp = cvCreateImage(size, IPL_DEPTH_8U, img->nChannels);
+	    cvCopy(img, imageTmp, NULL);
+
+	    // Create a new image of the detected region
+	    // Set region of interest to that surrounding the face
+	    cvSetImageROI(imageTmp, region);
+	    // Copy region of interest (i.e. face) into a new iplImage (imageRGB) and return it
+	    size.width = region.width;
+	    size.height = region.height;
+	    imageRGB = cvCreateImage(size, IPL_DEPTH_8U, img->nChannels);
+	    cvCopy(imageTmp, imageRGB, NULL);	// Copy just the region.
+
+            cvReleaseImage( &imageTmp );
+	    return imageRGB;
+        }
+
 	void detectAndDisplay( Mat frame ) {
 		// Preprocess
  		std::vector<cv::Rect> faces;

@@ -70,7 +70,7 @@ class SegbotProcessor {
          
          
       }
-
+/*
       void cropAndSave ( Mat img ) {
          //Shrink camera image to 320 pixels
          const int DETECTION_WIDTH = 320;
@@ -93,9 +93,9 @@ class SegbotProcessor {
          //Find Faces
   
       }
-
+*/
 	// Returns a new image that is a cropped version of the original image.
-	IplImage* FaceRecognitionLib::cropImage(const IplImage *img, const CvRect region)
+	IplImage* cropImage(const IplImage *img, const CvRect region)
 	{
 	    IplImage *imageTmp;
 	    IplImage *imageRGB;
@@ -142,10 +142,28 @@ class SegbotProcessor {
 			cv::Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
 			//Draw a rectangle around it
 			cv::rectangle(frame, cvPoint(faces[i].x, faces[i].y), cvPoint(faces[i].x + faces[i].width, faces[i].y + faces[i].height), Scalar(255, 0, 255), 1,8,0);
-			//Crop to just an image of that face?
-			
-			//Save croped image to faces data?
-		
+			//Crop to just an image of that face
+			//IplImage temp_frame_gray = frame_gray;
+			//IplImage *frame_gray_ptr = &temp_frame_gray;
+			//IplImage *face_img_ptr = cropImage(frame_gray_ptr, faces[i]);
+			//Mat face_img = Mat(face_img_ptr, true);
+
+			//Resize image
+         		//const int DETECTION_WIDTH = 320;
+         		// Possibly shirink the image, to run much faster
+        		//Mat small_img;
+         		//float scale = (face_img.cols / ( (float) DETECTION_WIDTH));
+         		//if ( face_img.cols > DETECTION_WIDTH) {
+            		//	//Shrink the image while keeping the same aspect ratio.
+            		//	int scaledHeight = cvRound(face_img.rows / scale);
+           		//	resize(face_img, small_img, Size(DETECTION_WIDTH, scaledHeight));
+         		//} else {
+            			//Acess the input directly since it is already small.
+            		//	small_img = face_img;
+         		//}
+	
+			//Save croped image to faces data TODO: THIS IS WHAT IS CRASSHING THE PROGRAM
+			//cvSaveImage("/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/data/image.pgm", &frame, NULL);		
   		}
   		
 		// Display Results

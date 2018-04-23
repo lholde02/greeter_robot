@@ -1,6 +1,7 @@
 #include <string>
 #include <algorithm>
 #include <stdio.h>
+#include <string.h>
 
 #include "tf/tf.h"
 #include "tf/transform_listener.h"
@@ -59,10 +60,13 @@ class SegbotProcessor {
       image_transport::ImageTransport it;
       image_transport::Subscriber image_sub;
       cv::CascadeClassifier face_cascade;
+      cv::CascadeClassifier eyes_cascade;
 
       bool first = true;
       bool killed = false;
       double lastIdle = -1;
+      int face_pic_num = 0;
+      string face_name;
 
       void retrieveFaces () {
          int numberOfImages = 0;
@@ -70,30 +74,6 @@ class SegbotProcessor {
          
          
       }
-/*
-      void cropAndSave ( Mat img ) {
-         //Shrink camera image to 320 pixels
-         const int DETECTION_WIDTH = 320;
-         // Possibly shirink the image, to run much faster
-         Mat smallImg;
-         float scale = (img.cols / ( (float) DETECTION_WIDTH));
-         if ( img.cols > DETECTION_WIDTH) {
-            //Shrink the image while keeping the same aspect ratio.
-            int scaledHeight = cvRound(img.rows / scale);
-            resize(img, smallImg, Size(DETECTION_WIDTH, scaledHeight));
-         } else {
-            //Acess the input directly since it is already small.
-            smallImg = img;
-         }
-
-         //Improve contrast and brightness
-         Mat equalizedImg;
-         cv::equalizeHist(smallImg, equalizedImg);
-
-         //Find Faces
-  
-      }
-*/
 	// Returns a new image that is a cropped version of the original image.
 	IplImage* cropImage(const IplImage *img, const CvRect region)
 	{
@@ -142,28 +122,41 @@ class SegbotProcessor {
 			cv::Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
 			//Draw a rectangle around it
 			cv::rectangle(frame, cvPoint(faces[i].x, faces[i].y), cvPoint(faces[i].x + faces[i].width, faces[i].y + faces[i].height), Scalar(255, 0, 255), 1,8,0);
+			//FIND EYES, ONLY USE FACES WITH EYES...
+			Mat faceROI = frame_gray(faces[i]);
+			std::vector<Rect> eyes;
+			eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+			for(size_t j = 0; j < eyes.size(); j++) {
+				cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
+       				int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+       				circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
 			//Crop to just an image of that face
-			//IplImage temp_frame_gray = frame_gray;
-			//IplImage *frame_gray_ptr = &temp_frame_gray;
-			//IplImage *face_img_ptr = cropImage(frame_gray_ptr, faces[i]);
-			//Mat face_img = Mat(face_img_ptr, true);
+			ROS_INFO("Croping face\n");
+			IplImage temp_frame_gray = frame_gray;
+			IplImage *frame_gray_ptr = &temp_frame_gray;
+			IplImage *face_img_ptr = cropImage(frame_gray_ptr, faces[i]);
+			Mat face_img = Mat(face_img_ptr, true);
 
 			//Resize image
-         		//const int DETECTION_WIDTH = 320;
-         		// Possibly shirink the image, to run much faster
-        		//Mat small_img;
-         		//float scale = (face_img.cols / ( (float) DETECTION_WIDTH));
-         		//if ( face_img.cols > DETECTION_WIDTH) {
-            		//	//Shrink the image while keeping the same aspect ratio.
-            		//	int scaledHeight = cvRound(face_img.rows / scale);
-           		//	resize(face_img, small_img, Size(DETECTION_WIDTH, scaledHeight));
-         		//} else {
+			ROS_INFO("Resizeing face\n");
+         		const int DETECTION_WIDTH = 320;
+        		Mat small_img;
+         		float scale = (face_img.cols / ( (float) DETECTION_WIDTH));
+         		if (face_img.cols > DETECTION_WIDTH) {
+            			//Shrink the image while keeping the same aspect ratio.
+            			int scaledHeight = cvRound(face_img.rows / scale);
+           			resize(face_img, small_img, Size(DETECTION_WIDTH, scaledHeight));
+         		} else {
             			//Acess the input directly since it is already small.
-            		//	small_img = face_img;
-         		//}
+            			small_img = face_img;
+         		}
 	
-			//Save croped image to faces data TODO: THIS IS WHAT IS CRASSHING THE PROGRAM
-			//cvSaveImage("/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/data/image.pgm", &frame, NULL);		
+			//Save croped image to faces data
+			ROS_INFO("Saveing face %i \n", face_pic_num);
+			String image_name = "/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/data/" + face_name + std::to_string(face_pic_num) + ".pgm";
+			face_pic_num = face_pic_num + 1;
+			imwrite(image_name, small_img);//save image
+			}
   		}
   		
 		// Display Results
@@ -188,11 +181,15 @@ class SegbotProcessor {
 	}
 
 public:
-	SegbotProcessor(NodeHandle& nh) : it(nh) {
+	SegbotProcessor(NodeHandle& nh, string name) : it(nh) {
 		processing = true;
 		image_sub = it.subscribe("/camera/rgb/image_raw", 1, &SegbotProcessor::callback, this);
-		String face_cascade_name = "haarcascade_frontalface_alt.xml";
+
+		face_name = name;
+		String face_cascade_name = "haarcascade_frontalface_default.xml";
+		String eyes_cascade_name = "haarcascade_eye.xml";
 		face_cascade.load( face_cascade_name );
+		eyes_cascade.load( eyes_cascade_name );
 	}
 	
 	~SegbotProcessor() {
@@ -220,7 +217,13 @@ public:
 
 int main(int argc, char** argv) {
 	init(argc, argv, "friendly_faces_runner");
-
+	string name;
+	if ( argc > 1) {
+		name = string(argv[1]);
+	} else {
+		ROS_ERROR("Need a name for the face\n");
+		return(1);
+	}
 	printf("CXX Standard:   %li\n", __cplusplus);
 	printf("OpenCV Version: %s\n", CV_VERSION);
 
@@ -228,7 +231,7 @@ int main(int argc, char** argv) {
 	client = new SoundClient;
 	namedWindow( "test", WINDOW_AUTOSIZE );
 
-	SegbotProcessor sp(nh);
+	SegbotProcessor sp(nh, name);
 	spin();
 	destroyWindow("cam");
 

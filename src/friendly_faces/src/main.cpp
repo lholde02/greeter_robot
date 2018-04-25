@@ -2,6 +2,9 @@
 #include <algorithm>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "tf/tf.h"
 #include "tf/transform_listener.h"
@@ -45,6 +48,10 @@ string doors[] = {"d3_414b1","d3_414b2", "d3_414a1", "d3_414a2"};
 int doors_sz = 4;
 
 String window_name = "Capture - Face detection";
+
+string data_folder = "/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/data/";
+String face_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/classifiers/haarcascade_frontalface_default.xml";
+String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/classifiers/haarcascade_eye.xml";
 
 //init
 SoundClient* client;
@@ -110,7 +117,6 @@ class SegbotProcessor {
  		std::vector<cv::Rect> faces;
 		cv::Mat frame_gray;
  		cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
- 		//cropAndSave(frame_gray);
   		cv::equalizeHist( frame_gray, frame_gray );
 
   		// Detect Faces
@@ -131,14 +137,12 @@ class SegbotProcessor {
        				int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
        				circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
 			//Crop to just an image of that face
-			ROS_INFO("Croping face\n");
 			IplImage temp_frame_gray = frame_gray;
 			IplImage *frame_gray_ptr = &temp_frame_gray;
 			IplImage *face_img_ptr = cropImage(frame_gray_ptr, faces[i]);
 			Mat face_img = Mat(face_img_ptr, true);
 
 			//Resize image
-			ROS_INFO("Resizeing face\n");
          		const int DETECTION_WIDTH = 320;
         		Mat small_img;
          		float scale = (face_img.cols / ( (float) DETECTION_WIDTH));
@@ -151,9 +155,27 @@ class SegbotProcessor {
             			small_img = face_img;
          		}
 	
-			//Save croped image to faces data
+			//Check if the person's folder exists already
+			struct stat sb;
+			if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {
+				//Folder does not exist already
+				//Make a folder
+				ROS_INFO("Createing a folder for images %s \n", face_name.c_str());
+				mkdir((data_folder + face_name).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+			} else if (face_pic_num == 0) {
+				//Folder exists, so it might have files in it we dont want to overwite, so we must count the files in it
+				DIR *dp;
+				struct dirent *ep;
+				dp = opendir( (data_folder + face_name).c_str());
+				while (ep = readdir (dp))
+					face_pic_num++;
+				(void) closedir(dp);
+			}
+			//Save croped image to faces data in their folder
+			//ensure sequential naming of photos,
+			//even if there are already photos in the folder
 			ROS_INFO("Saveing face %i \n", face_pic_num);
-			String image_name = "/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/data/" + face_name + std::to_string(face_pic_num) + ".pgm";
+			String image_name = data_folder + face_name + "/" + std::to_string(face_pic_num) + ".pgm";
 			face_pic_num = face_pic_num + 1;
 			imwrite(image_name, small_img);//save image
 			}
@@ -186,8 +208,6 @@ public:
 		image_sub = it.subscribe("/camera/rgb/image_raw", 1, &SegbotProcessor::callback, this);
 
 		face_name = name;
-		String face_cascade_name = "haarcascade_frontalface_default.xml";
-		String eyes_cascade_name = "haarcascade_eye.xml";
 		face_cascade.load( face_cascade_name );
 		eyes_cascade.load( eyes_cascade_name );
 	}

@@ -32,6 +32,7 @@ add_executable(greeter_robot_runner
 	src/fps.cpp
 	src/image_proc.cpp
 	src/text.cpp
+	src/face_detection.cpp
 	src/main.cpp
 	src/face_detection.cpp
 	src/face_recognition.cpp

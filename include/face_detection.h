@@ -1,4 +1,6 @@
-#pragma once
+#ifndef FACE_DETECTION_H
+#define FACE_DETECTION_H
+//#pragma once
 
 #include <string>
 #include <algorithm>
@@ -61,6 +63,10 @@ class SegbotProcessor {
 	public:
 		SegbotProcessor(NodeHandle& nh, string name);
 		~SegbotProcessor();
+		void _idle();
+		void _kill_idle();
+
 };
 
 void detect_face(string name);
+#endif

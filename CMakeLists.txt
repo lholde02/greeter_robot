@@ -33,6 +33,8 @@ add_executable(greeter_robot_runner
 	src/image_proc.cpp
 	src/text.cpp
 	src/main.cpp
+	src/face_detection.cpp
+	src/face_recognition.cpp
 )
 add_dependencies(greeter_robot_runner ${catkin_EXPORTED_TARGETS})
 target_link_libraries(greeter_robot_runner ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

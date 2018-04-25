@@ -1,42 +1,4 @@
-#include <string>
-#include <algorithm>
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <dirent.h>
-
-#include "tf/tf.h"
-#include "tf/transform_listener.h"
-#include "image_transport/image_transport.h"
-#include "cv_bridge/cv_bridge.h"
-#include "sensor_msgs/image_encodings.h"
-#include "move_base_msgs/MoveBaseAction.h"
-#include "actionlib/client/action_client.h"
-#include "actionlib/client/simple_action_client.h"
-#include "actionlib/server/simple_action_server.h"
-
-#include "opencv2/opencv.hpp"
-#include "ros/ros.h"
-#include "sound_play/sound_play.h"
-
-#include <opencv2/core/core.hpp>
-#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-
-#include "text.h"
-#include "storage.h"
-#include "image_proc.h"
-#include "fps.h"
-
-using namespace tf;
-using namespace std;
-using namespace ros;
-using namespace cv_bridge;
-using namespace actionlib;
-using namespace sound_play;
-using namespace move_base_msgs;
+#include <face_detection.h>
 
 string greetings[] = {"hello", "hey there", "how are you", "nice to see you again"};
 int greetings_sz = 4;
@@ -235,18 +197,8 @@ public:
 	}
 };
 
-int main(int argc, char** argv) {
-	init(argc, argv, "friendly_faces_runner");
-	string name;
-	if ( argc > 1) {
-		name = string(argv[1]);
-	} else {
-		ROS_ERROR("Need a name for the face\n");
-		return(1);
-	}
-	printf("CXX Standard:   %li\n", __cplusplus);
-	printf("OpenCV Version: %s\n", CV_VERSION);
-
+Void detect_face(string name) {
+	
 	NodeHandle nh;
 	client = new SoundClient;
 	namedWindow( "test", WINDOW_AUTOSIZE );

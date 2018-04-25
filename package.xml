@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <package>
-	<name>friendly_faces</name>
+	<name>greeter_robot</name>
 	<version>0.0.0</version>
-	<description>The friendly_faces package</description>
+	<description>The greeter_robot package</description>
 
-	<maintainer email="todo@todo.todo">Ailyn Aguirre</maintainer>
-	<maintainer email="todo@todo.todo">Anjuli Goring</maintainer>
-	<maintainer email="mwebb@utexas.edu">Matthew Webb</maintainer>
+	<maintainer email="anneoursler@gmail.com">Anne Oursler</maintainer>
+	<maintainer email="Leah.Holden@Tufts.edu">Leah Holden</maintainer>
+	<maintainer email="lmdierker@gmail.com">Lauren Dierker</maintainer>
 
 	<license>MIT</license>
 

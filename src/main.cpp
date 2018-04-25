@@ -1,4 +1,4 @@
-#include <face_detection.h>
+#include "face_detection.h"
 
 int main(int argc, char** argv) {
 	init(argc, argv, "greeter_robot_runner");
@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 	printf("CXX Standard:   %li\n", __cplusplus);
 	printf("OpenCV Version: %s\n", CV_VERSION);
 
-	detect_faces(name);
+	detect_face(name);
 
 	return 0;
 }

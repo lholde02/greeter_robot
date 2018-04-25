@@ -1,4 +1,4 @@
-#include <face_detection.h>
+#include "face_detection.h"
 
 string greetings[] = {"hello", "hey there", "how are you", "nice to see you again"};
 int greetings_sz = 4;
@@ -11,9 +11,9 @@ int doors_sz = 4;
 
 String window_name = "Capture - Face detection";
 
-string data_folder = "/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/data/";
-String face_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/classifiers/haarcascade_frontalface_default.xml";
-String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/src/friendly_faces/classifiers/haarcascade_eye.xml";
+string data_folder = "/home/turtlebot/catkin_ws/src/greeter_robot/data/";
+String face_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_frontalface_default.xml";
+String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_eye.xml";
 
 //init
 SoundClient* client;
@@ -23,29 +23,26 @@ bool idle = true;
 vector<pair<Rect, string>> prevFaces;
 cv::Mat frame;
 
-class SegbotProcessor {
-   private:
-      bool processing = true;
-      image_transport::ImageTransport it;
-      image_transport::Subscriber image_sub;
-      cv::CascadeClassifier face_cascade;
-      cv::CascadeClassifier eyes_cascade;
+//bool SegbotProcessor::processing = true;
+//image_transport::ImageTransport it;
+//      image_transport::Subscriber image_sub;
+//      cv::CascadeClassifier face_cascade;
+//      cv::CascadeClassifier eyes_cascade;
 
-      bool first = true;
-      bool killed = false;
-      double lastIdle = -1;
-      int face_pic_num = 0;
-      string face_name;
+//      bool first = true;
+//      bool killed = false;
+//      double lastIdle = -1;
+//      int face_pic_num = 0;
+//      string face_name;
 
-      void retrieveFaces () {
+void SegbotProcessor::retrieveFaces () {
          int numberOfImages = 0;
          int goalNumberOfImages = 50;
          
          
       }
 	// Returns a new image that is a cropped version of the original image.
-	IplImage* cropImage(const IplImage *img, const CvRect region)
-	{
+IplImage* SegbotProcessor::cropImage(const IplImage *img, const CvRect region) {
 	    IplImage *imageTmp;
 	    IplImage *imageRGB;
 	    CvSize size;
@@ -74,7 +71,7 @@ class SegbotProcessor {
 	    return imageRGB;
         }
 
-	void detectAndDisplay( Mat frame ) {
+void SegbotProcessor::detectAndDisplay( Mat frame ) {
 		// Preprocess
  		std::vector<cv::Rect> faces;
 		cv::Mat frame_gray;
@@ -148,7 +145,7 @@ class SegbotProcessor {
   		waitKey(10);    
  	}
 
-	void callback(const sensor_msgs::ImageConstPtr& msg) {
+void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
 		if (!processing) {
 			_kill_idle();
 			return;
@@ -164,8 +161,7 @@ class SegbotProcessor {
 		detectAndDisplay(cv_ptr->image.clone());
 	}
 
-public:
-	SegbotProcessor(NodeHandle& nh, string name) : it(nh) {
+SegbotProcessor::SegbotProcessor(NodeHandle& nh, string name) : it(nh) {
 		processing = true;
 		image_sub = it.subscribe("/camera/rgb/image_raw", 1, &SegbotProcessor::callback, this);
 
@@ -174,10 +170,10 @@ public:
 		eyes_cascade.load( eyes_cascade_name );
 	}
 	
-	~SegbotProcessor() {
+SegbotProcessor::~SegbotProcessor() {
 	}
 
-	void _idle() {
+void SegbotProcessor::_idle() {
 		if (lastIdle == -1 || Time::now().toSec() - lastIdle > 1) {
 			lastIdle = Time::now().toSec();
 		} else {
@@ -185,7 +181,7 @@ public:
 		}
 	}
 	
-	void _kill_idle() {
+void SegbotProcessor::_kill_idle() {
 		lastIdle = -1;
 		first = true;
 		
@@ -194,10 +190,10 @@ public:
 		if (killed) {
 			return;
 		}
-	}
-};
+}
+	
 
-Void detect_face(string name) {
+void detect_face(string name) {
 	
 	NodeHandle nh;
 	client = new SoundClient;
@@ -209,5 +205,5 @@ Void detect_face(string name) {
 
 	free(client);
 
-	return 0;
+	return;
 }

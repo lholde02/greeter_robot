@@ -1,6 +1,6 @@
-#include "opencv2/core.hpp"
-#include "opencv2/face.hpp"
-#include "opencv2/highgui.hpp"
+/*#include "opencv2/core/core.hpp"
+//#include "opencv2/face/face.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -20,5 +20,5 @@ class Face_Recognition {
 	   void update_model(vector<Mat> imgs, vector<int> labels);
 	   int identify(Mat img);
 };
-	   
+*/	   
 

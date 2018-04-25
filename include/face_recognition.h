@@ -12,12 +12,13 @@ using namespace std;
 
 class Face_Recognition {
 	private:
+	   Ptr<LBPHFaceRecognizer> model;
 	   string model_path = "/home/turtlebot/catkin_ws/src/greeter_robot/data/recognizer_model.xml";
 	   static void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels, char separator);
 	public:
-	   void init(vector<Mat> imgs, vector<int> labels);
+	   Face_Recognition(vector<Mat> imgs, vector<int> labels);
 	   void update_model(vector<Mat> imgs, vector<int> labels);
-	   string identify(Mat img);
+	   int identify(Mat img);
 };
 	   
 

@@ -12,7 +12,7 @@ using namespace cv;
 using namespace cv::face;
 using namespace std;
 
-static void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels, char separator = ';') {
+static void Face_Recognition::read_csv(const string& filename, vector<Mat>& images, vector<int>& labels, char separator = ';') {
     std::ifstream file(filename.c_str(), ifstream::in);
     if (!file) {
         string error_message = "No valid input file was given, please check the given filename.";
@@ -30,8 +30,17 @@ static void read_csv(const string& filename, vector<Mat>& images, vector<int>& l
     }
 }
 
-void init(vector<Mat> imgs, vector<int> labels) {
-    Ptr<LBPHFaceRecognizer> model = LCPHFaceRecognizer::create();
+Face_Recognition::Face_Recognition(vector<Mat> imgs, vector<int> labels) {
+    model = LCPHFaceRecognizer::create();
     model->train(imgs, labels);
-    model->save(model->model_path); 
+    model->save(model_path); 
+}
+
+void Face_Recognition::update_model(vector<Mat> imgs, vector<int> labels) {
+    model->update(imgs, labels);
+    model->save(model_path);
+}
+
+int Face_Recognition::identify(Mat img) {
+    return model->predict(img);
 }

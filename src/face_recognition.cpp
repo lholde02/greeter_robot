@@ -1,4 +1,5 @@
-/*#include "opencv2/core/core.hpp"
+#include "opencv2/core/core.hpp"
+#include <opencv2/contrib/contrib.hpp>
 //#include "opencv2/face/face.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
@@ -9,14 +10,15 @@
 #include "face_recognition.h"
 
 using namespace cv;
-using namespace cv::face;
+//using namespace cv::face;
 using namespace std;
 
-static void Face_Recognition::read_csv(const string& filename, vector<Mat>& images, vector<int>& labels, char separator = ';') {
+
+void Face_Recognition::read_csv(const string& filename, vector<Mat>& images, vector<int>& labels, char separator = ';') {
     std::ifstream file(filename.c_str(), ifstream::in);
     if (!file) {
         string error_message = "No valid input file was given, please check the given filename.";
-        CV_Error(Error::StsBadArg, error_message);
+        CV_Error(CV_StsBadArg, error_message);
     }
     string line, path, classlabel;
     while (getline(file, line)) {
@@ -31,7 +33,7 @@ static void Face_Recognition::read_csv(const string& filename, vector<Mat>& imag
 }
 
 Face_Recognition::Face_Recognition(vector<Mat> imgs, vector<int> labels) {
-    model = LCPHFaceRecognizer::create();
+    model = cv::createEigenFaceRecognizer(); //LCPHFaceRecognizer::create();
     model->train(imgs, labels);
     model->save(model_path); 
 }
@@ -44,4 +46,3 @@ void Face_Recognition::update_model(vector<Mat> imgs, vector<int> labels) {
 int Face_Recognition::identify(Mat img) {
     return model->predict(img);
 }
-*/

@@ -23,21 +23,9 @@ bool idle = true;
 vector<pair<Rect, string>> prevFaces;
 cv::Mat frame;
 
-//bool SegbotProcessor::processing = true;
-//image_transport::ImageTransport it;
-//      image_transport::Subscriber image_sub;
-//      cv::CascadeClassifier face_cascade;
-//      cv::CascadeClassifier eyes_cascade;
-
-//      bool first = true;
-//      bool killed = false;
-//      double lastIdle = -1;
-//      int face_pic_num = 0;
-//      string face_name;
-
 void SegbotProcessor::retrieveFaces () {
-         int numberOfImages = 0;
-         int goalNumberOfImages = 50;
+//         int numberOfImages = 0;
+ //        int goalNumberOfImages = 50;
          
          
       }

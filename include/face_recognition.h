@@ -12,8 +12,18 @@ using namespace std;
 
 class Face_Recognition {
 	private:
-	   Mat norm_0_255(InputArray _src);
-           void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels, char separator);
+	   const double IMAGE_WIDTH = 100;
+ 	   const double IMAGE_HEIGHT = 100;
+	   const string fn_csv = "/home/turtlebot/catkin_ws/src/greeter_robot/data/faces.csv";
+           const char csv_separator = ';';
+           vector<Mat> images;
+           vector<int> labels;
+	   int height;
+	   Mat testSample; //TODO: REMOVE
+	   int testLabel; //TODO: REMOVE
+	   Ptr<FaceRecognizer> model;
+           void read_csv();
 	public:
 	   int recognize_faces();
+	   Face_Recognition();
 };

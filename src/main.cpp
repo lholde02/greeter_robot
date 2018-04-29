@@ -1,8 +1,8 @@
-/*
+
 #include "face_detection.h"
 #include "face_recognition.h"
 #include <opencv2/contrib/contrib.hpp>
-
+/*
 int main(int argc, char** argv) {
 	init(argc, argv, "greeter_robot_runner");
 	string name;
@@ -56,6 +56,9 @@ int main(int argc, char** argv) {
 
 using namespace cv;
 using namespace std;
+
+double IMAGE_WIDTH = 100;
+double IMAGE_HEIGHT = 100;
 
 static Mat norm_0_255(InputArray _src) {
     Mat src = _src.getMat();

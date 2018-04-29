@@ -52,10 +52,11 @@ int Face_Recognition::recognize_faces() {
     // predict the face in an image with the confidence
     int predictedLabel = -1;
     double confidence = 0.0;
-    model->predict(testSample, predictedLabel, confidence);
-
-    ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
-    ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
+    for (int i = 0; i < testSample.size(); i++) {
+    	model->predict(testSample[i], predictedLabel, confidence);
+        ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
+        ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
+    }
     //TODO: Write code to get name given label    
 
     return predictedLabel;
@@ -80,11 +81,13 @@ Face_Recognition::Face_Recognition() {
     height = images[0].rows;
 
     //TODO: GET IMAGE TO RECOGNIZE FROM FACIAL DETECTION AND CAMERA
-    //TODO: REMOVE THE FOLOWING 4 LINES
-    testSample = images[images.size() - 1];
-    testLabel = labels[labels.size() - 1];
-    images.pop_back();
-    labels.pop_back();
+    //TODO: REMOVE THE FOLOWING 6 LINES
+    for (int i = 0; i < 3; i++) {
+    	testSample.push_back(images[images.size() - 1]);
+    	testLabel.push_back(labels[labels.size() - 1]);
+    	images.pop_back();
+    	labels.pop_back();
+    }
 
     // The following lines create an Eigenfaces model for
     // face recognition and train it with the images and

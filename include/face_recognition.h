@@ -19,8 +19,8 @@ class Face_Recognition {
            vector<Mat> images;
            vector<int> labels;
 	   int height;
-	   Mat testSample; //TODO: REMOVE
-	   int testLabel; //TODO: REMOVE
+	   vector<Mat> testSample; //TODO: REMOVE
+	   vector<int> testLabel; //TODO: REMOVE
 	   Ptr<FaceRecognizer> model;
            void read_csv();
 	public:

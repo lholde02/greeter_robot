@@ -63,7 +63,7 @@ Mat SegbotProcessor::preProcessImage(Mat frame) {
 }
 
 void SegbotProcessor::detectAndDisplay( Mat frame ) {
-        	ROS_DEBUG("In detect and Display\n");
+        	ROS_INFO("In detect and Display\n");
 		// Preprocess
 		//cv::Mat frame_gray;
  		//cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
@@ -161,7 +161,7 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
  	}
 
 void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
-       	 	ROS_DEBUG("In callback\n");
+       	 	ROS_INFO("In callback\n");
 		if (!processing) {
 			_kill_idle();
 			return;
@@ -217,7 +217,7 @@ void SegbotProcessor::_kill_idle() {
 	}
 	
 	vector<Mat> SegbotProcessor::get_visible_faces() {
-		ROS_INFO("In get visible faces\n");
+		ROS_DEBUG("In get visible faces\n");
 		return visible_faces;
 	}
 //This should no longer be neccisary....

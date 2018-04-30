@@ -32,7 +32,7 @@ using namespace cv;
 using namespace std;
 
 void Face_Recognition::read_csv() {
-    ROS_INFO("In read csv\n");
+    ROS_DEBUG("In read csv\n");
     std::ifstream file(fn_csv.c_str(), ifstream::in);
     if (!file) {
         string error_message = "No valid input file was given, please check the given filename.";
@@ -61,11 +61,11 @@ void Face_Recognition::read_csv() {
 }
 
 int Face_Recognition::recognize_faces() {
-    ROS_INFO("In recognize faces\n");
+    ROS_DEBUG("In recognize faces\n");
     // predict the face in an image with the confidence
     int predictedLabel = -1;
     double confidence = 0.0;
-    ROS_INFO("Getting visible faces\n");
+    ROS_DEBUG("Getting visible faces\n");
     vector<Mat> visible_faces = face_detection->get_visible_faces();
     for (int i = 0; i < visible_faces.size(); i++){
 	model->predict(visible_faces[i], predictedLabel, confidence);
@@ -82,13 +82,13 @@ int Face_Recognition::recognize_faces() {
 */
     //TODO: Write code to get name given label    
     //TODO: RETURN ALL PERDICTED LABELS
-    ROS_INFO("Returning the last predictive lable: %i \n", predictedLabel);
+    ROS_DEBUG("Returning the last predictive lable: %i \n", predictedLabel);
     return predictedLabel;
 }
 
 Face_Recognition::Face_Recognition(SegbotProcessor *face_detection_instance) {
-    ROS_INFO("In face recognition constructor\n");
-    ROS_INFO("setting face detection instance\n");
+    ROS_DEBUG("In face recognition constructor\n");
+    ROS_DEBUG("setting face detection instance\n");
     face_detection = face_detection_instance;
     // Read in the data. This can fail if no valid
     // input filename is given.
@@ -99,7 +99,7 @@ Face_Recognition::Face_Recognition(SegbotProcessor *face_detection_instance) {
         // nothing more we can do
         exit(1);
     }
-    ROS_INFO("Ensuring there are enough images\n");
+    ROS_DEBUG("Ensuring there are enough images\n");
     // Quit if there are not enough images.
     if(images.size() <= 1) {
         string error_message = "This demo needs at least 2 images to work. Please add more images to your data set!";
@@ -142,5 +142,5 @@ Face_Recognition::Face_Recognition(SegbotProcessor *face_detection_instance) {
     ROS_INFO("training the recognizer\n");
     //Train the Faceial Recognizer
     model->train(images, labels);
-    ROS_INFO("returning from constructor\n");
+    ROS_INFO("finished training the recognizer\n");
 }

@@ -9,13 +9,13 @@ int main(int argc, char** argv) {
 
 	//create a face_detection instance (sp)
 	//TODO: RENAME FACE_DETECTION CLASS
-	ROS_INFO("Making a sound client\n");
+	ROS_DEBUG("Making a sound client\n");
 	SoundClient* client;
-	ROS_INFO("Making a node handle\n");
+	ROS_DEBUG("Making a node handle\n");
 	NodeHandle nh;
-	ROS_INFO("Initizing the sound client\n");
+	ROS_DEBUG("Initizing the sound client\n");
         client = new SoundClient;
-	ROS_INFO("Creating a test window");
+	ROS_DEBUG("Creating a test window");
         namedWindow( "test", WINDOW_AUTOSIZE );
 	ROS_INFO("Createing an instance of the face recognition class\n");
         SegbotProcessor sp(nh);
@@ -27,11 +27,11 @@ int main(int argc, char** argv) {
 	Face_Recognition face_recognition = Face_Recognition(&sp);
 	
 	while(true) {
-		ROS_INFO("Attempting to recognize a face\n");
+		//ROS_INFO("Attempting to recognize a face\n");
 		//detect_face(name);
 		int label = face_recognition.recognize_faces();
 		if (label < 0) {
-			ROS_INFO("No person seen, repeat again!\n");
+			ROS_DEBUG("No person seen, repeat again!\n");
 		} else {
 			ROS_INFO("Hello person %i\n!", label);
 			break;

@@ -1,19 +1,11 @@
 #include "face_detection.h"
 
-string greetings[] = {"hello", "hey there", "how are you", "nice to see you again"};
-int greetings_sz = 4;
 
-string goodbyes[] = {"good bye", "see you later", "bye", "I'll miss you"};
-int goodbyes_sz = 4;
+//String window_name = "Capture - Face detection";
 
-string doors[] = {"d3_414b1","d3_414b2", "d3_414a1", "d3_414a2"};
-int doors_sz = 4;
-
-String window_name = "Capture - Face detection";
-
-string data_folder = "/home/turtlebot/catkin_ws/src/greeter_robot/data/";
-String face_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_frontalface_default.xml";
-String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_eye.xml";
+//string data_folder = "/home/turtlebot/catkin_ws/src/greeter_robot/data/";
+//String face_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_frontalface_default.xml";
+//String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_eye.xml";
 
 //init
 SoundClient* client;
@@ -59,15 +51,22 @@ IplImage* SegbotProcessor::cropImage(const IplImage *img, const CvRect region) {
 	    return imageRGB;
         }
 
+Mat SegbotProcessor::preProcessImage(Mat frame) {
+                cv::Mat frame_gray;
+                cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
+                cv::equalizeHist( frame_gray, frame_gray );
+
+}
 void SegbotProcessor::detectAndDisplay( Mat frame ) {
 		// Preprocess
- 		std::vector<cv::Rect> faces;
-		cv::Mat frame_gray;
- 		cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
-  		cv::equalizeHist( frame_gray, frame_gray );
+		//cv::Mat frame_gray;
+ 		//cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
+  		//cv::equalizeHist( frame_gray, frame_gray );
+		frame = preProcessImage(frame);
 
   		// Detect Faces
-  		face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+                std::vector<cv::Rect> faces;
+  		face_cascade.detectMultiScale( frame/*_gray*/, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
 		
 		//For Each Face
   		for( size_t i = 0; i < faces.size(); i++ ) {
@@ -75,33 +74,47 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			cv::Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
 			//Draw a rectangle around it
 			cv::rectangle(frame, cvPoint(faces[i].x, faces[i].y), cvPoint(faces[i].x + faces[i].width, faces[i].y + faces[i].height), Scalar(255, 0, 255), 1,8,0);
-			//FIND EYES, ONLY USE FACES WITH EYES...
-			Mat faceROI = frame_gray(faces[i]);
+			Mat faceROI = frame/*_gray*/(faces[i]);
+
+			//Find Eyes
 			std::vector<Rect> eyes;
 			eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+			//For Each Face with Eyes
+			//By only working with faces with eyes we ensure fewer false positives
 			for(size_t j = 0; j < eyes.size(); j++) {
+				// Find the center
+				// NOTE: Only neccisary for displaying
 				cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
+				// Draw a circle around the eyes
+				// NOTE: (Only neccisary for displaying
        				int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
        				circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
-			//Crop to just an image of that face
-			IplImage temp_frame_gray = frame_gray;
-			IplImage *frame_gray_ptr = &temp_frame_gray;
-			IplImage *face_img_ptr = cropImage(frame_gray_ptr, faces[i]);
-			Mat face_img = Mat(face_img_ptr, true);
+				
+				//  Crop to just an image of that face
+				// TODO: Move conversion into crop
+				IplImage temp_frame_gray = frame/*_gray*/;
+				IplImage *frame_gray_ptr = &temp_frame_gray;
+				IplImage *face_img_ptr = cropImage(frame_gray_ptr, faces[i]);
+				Mat face_img = Mat(face_img_ptr, true);
 
-			//Resize image
-         		const int DETECTION_WIDTH = 320;
-        		Mat small_img;
-         		float scale = (face_img.cols / ( (float) DETECTION_WIDTH));
-         		if (face_img.cols > DETECTION_WIDTH) {
-            			//Shrink the image while keeping the same aspect ratio.
-            			int scaledHeight = cvRound(face_img.rows / scale);
-           			resize(face_img, small_img, Size(DETECTION_WIDTH, scaledHeight));
-         		} else {
-            			//Acess the input directly since it is already small.
-            			small_img = face_img;
-         		}
+				//Resize image
+				//TODO: Ensure all images end up 100x100
+         			const int DETECTION_WIDTH = 320;
+        			Mat small_img;
+         			float scale = (face_img.cols / ( (float) DETECTION_WIDTH));
+         			if (face_img.cols > DETECTION_WIDTH) {
+            				//Shrink the image while keeping the same aspect ratio.
+            				int scaledHeight = cvRound(face_img.rows / scale);
+           				resize(face_img, small_img, Size(DETECTION_WIDTH, scaledHeight));
+         			} else {
+            				//Acess the input directly since it is already small.
+            				small_img = face_img;
+         			}
 	
+
+			//TODO: IF COUNT > 0, SAVE THE FACES UNDER NAME, AND DECREMENT
+			//TODO: Save all faces to variable (write getter, so recognize faces can get it at any time) -- do I need a lock on this?
+
 			//Check if the person's folder exists already
 			struct stat sb;
 			if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {

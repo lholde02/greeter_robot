@@ -44,6 +44,12 @@ using namespace move_base_msgs;
 
 class SegbotProcessor {
    	private:
+		const String window_name = "Capture - Face Detection";
+		const string data_folder = "/home/turtlebot/catkin_ws/src/greeter_robot/data/";
+		const String face_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_frontalface_default.xml";
+		const String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_eye.xml";
+
+
       		bool processing = true;
       		image_transport::ImageTransport it;
       		image_transport::Subscriber image_sub;
@@ -57,7 +63,8 @@ class SegbotProcessor {
       		string face_name;
 
       		void retrieveFaces ();
-		IplImage* cropImage(const IplImage *img, const CvRect region);
+		IplImage *cropImage(const IplImage *img, const CvRect region);
+		Mat preProcessImage(Mat frame);
 		void detectAndDisplay( Mat frame );
 		void callback(const sensor_msgs::ImageConstPtr& msg);
 	public:

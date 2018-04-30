@@ -4,19 +4,41 @@
 
 int main(int argc, char** argv) {
 	init(argc, argv, "greeter_robot_runner");
-	string name;
-	if ( argc > 1) {
-		name = string(argv[1]);
-	} else {
-		ROS_ERROR("Need a name for the new face\n");
-		return(1);
-	}
 	printf("CXX Standard:   %li\n", __cplusplus);
 	printf("OpenCV Version: %s\n", CV_VERSION);
 
-	Face_Recognition face_recognition = Face_Recognition();
-	//detect_face(name);
-	face_recognition.recognize_faces();
+	//create a face_detection instance (sp)
+	//TODO: RENAME FACE_DETECTION CLASS
+	ROS_INFO("Making a sound client\n");
+	SoundClient* client;
+	ROS_INFO("Making a node handle\n");
+	NodeHandle nh;
+	ROS_INFO("Initizing the sound client\n");
+        client = new SoundClient;
+	ROS_INFO("Creating a test window");
+        namedWindow( "test", WINDOW_AUTOSIZE );
+	ROS_INFO("Createing an instance of the face recognition class\n");
+        SegbotProcessor sp(nh);
+	//ROS_INFO("Spinning...\n");
+        //spin();
 
+	// create a face recognition instance
+        ROS_INFO("Making an instance of face recognition\n");
+	Face_Recognition face_recognition = Face_Recognition(&sp);
+	
+	while(true) {
+		ROS_INFO("Attempting to recognize a face\n");
+		//detect_face(name);
+		int label = face_recognition.recognize_faces();
+		if (label < 0) {
+			ROS_INFO("No person seen, repeat again!\n");
+		} else {
+			ROS_INFO("Hello person %i\n!", label);
+			break;
+		}
+	}
+	ROS_INFO("Destroying the window\n");
+        destroyWindow("cam");
+	free(client);
 	return 0;
 }

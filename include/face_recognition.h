@@ -16,6 +16,7 @@ class Face_Recognition {
  	   const double IMAGE_HEIGHT = 100;
 	   const string fn_csv = "/home/turtlebot/catkin_ws/src/greeter_robot/data/faces.csv";
            const char csv_separator = ';';
+	   SegbotProcessor *face_detection;
            vector<Mat> images;
            vector<int> labels;
 	   int height;
@@ -25,5 +26,5 @@ class Face_Recognition {
            void read_csv();
 	public:
 	   int recognize_faces();
-	   Face_Recognition();
+	   Face_Recognition(SegbotProcessor *face_detection_instance);
 };

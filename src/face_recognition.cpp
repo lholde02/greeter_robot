@@ -22,6 +22,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/contrib/contrib.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -31,6 +32,7 @@ using namespace cv;
 using namespace std;
 
 void Face_Recognition::read_csv() {
+    ROS_INFO("In read csv\n");
     std::ifstream file(fn_csv.c_str(), ifstream::in);
     if (!file) {
         string error_message = "No valid input file was given, please check the given filename.";
@@ -42,27 +44,52 @@ void Face_Recognition::read_csv() {
         getline(liness, path, csv_separator);
         getline(liness, classlabel);
         if(!path.empty() && !classlabel.empty()) {
-            images.push_back(imread(path, 0));
+	    Mat img = imread(path, IMREAD_GRAYSCALE);
+	    if (img.empty()) {
+		cout << path << "could not be read!" << endl;
+		exit(-1);
+	    }
+	    images.push_back(img);		
+            //images.push_back(imread(path, 0));
+	    //Mat m = imread(path, 1);
+	    //Mat m2;
+	    //cvtColor(m, m2, CV_BGR_GRAY);
+	    //images.push_back(m2);
             labels.push_back(atoi(classlabel.c_str()));
         }
     }
 }
 
 int Face_Recognition::recognize_faces() {
+    ROS_INFO("In recognize faces\n");
     // predict the face in an image with the confidence
     int predictedLabel = -1;
     double confidence = 0.0;
+    ROS_INFO("Getting visible faces\n");
+    vector<Mat> visible_faces = face_detection->get_visible_faces();
+    for (int i = 0; i < visible_faces.size(); i++){
+	model->predict(visible_faces[i], predictedLabel, confidence);
+        ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
+        ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
+
+    }
+/*
     for (int i = 0; i < testSample.size(); i++) {
     	model->predict(testSample[i], predictedLabel, confidence);
         ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
         ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
     }
+*/
     //TODO: Write code to get name given label    
-
+    //TODO: RETURN ALL PERDICTED LABELS
+    ROS_INFO("Returning the last predictive lable: %i \n", predictedLabel);
     return predictedLabel;
 }
 
-Face_Recognition::Face_Recognition() {
+Face_Recognition::Face_Recognition(SegbotProcessor *face_detection_instance) {
+    ROS_INFO("In face recognition constructor\n");
+    ROS_INFO("setting face detection instance\n");
+    face_detection = face_detection_instance;
     // Read in the data. This can fail if no valid
     // input filename is given.
     try {
@@ -72,7 +99,8 @@ Face_Recognition::Face_Recognition() {
         // nothing more we can do
         exit(1);
     }
-    // Quit if there are not enough images for this demo.
+    ROS_INFO("Ensuring there are enough images\n");
+    // Quit if there are not enough images.
     if(images.size() <= 1) {
         string error_message = "This demo needs at least 2 images to work. Please add more images to your data set!";
         CV_Error(CV_StsError, error_message);
@@ -82,12 +110,12 @@ Face_Recognition::Face_Recognition() {
 
     //TODO: GET IMAGE TO RECOGNIZE FROM FACIAL DETECTION AND CAMERA
     //TODO: REMOVE THE FOLOWING 6 LINES
-    for (int i = 0; i < 3; i++) {
-    	testSample.push_back(images[images.size() - 1]);
-    	testLabel.push_back(labels[labels.size() - 1]);
-    	images.pop_back();
-    	labels.pop_back();
-    }
+//    for (int i = 0; i < 3; i++) {
+//    	testSample.push_back(images[images.size() - 1]);
+//   	testLabel.push_back(labels[labels.size() - 1]);
+//    	images.pop_back();
+//    	labels.pop_back();
+//    }
 
     // The following lines create an Eigenfaces model for
     // face recognition and train it with the images and
@@ -108,9 +136,11 @@ Face_Recognition::Face_Recognition() {
     //
     //      cv::createEigenFaceRecognizer(0, 123.0);
     //
+    ROS_INFO("creating eigenfaces recognizer\n");
     //Create a Faceial Recognizer
     model = createEigenFaceRecognizer();
+    ROS_INFO("training the recognizer\n");
     //Train the Faceial Recognizer
     model->train(images, labels);
-
+    ROS_INFO("returning from constructor\n");
 }

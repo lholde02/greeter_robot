@@ -8,21 +8,22 @@
 //String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_eye.xml";
 
 //init
-SoundClient* client;
+//SoundClient* client;
 
 //loop stuff
 bool idle = true;
 vector<pair<Rect, string>> prevFaces;
 cv::Mat frame;
 
-void SegbotProcessor::retrieveFaces () {
+//void SegbotProcessor::retrieveFaces () {
 //         int numberOfImages = 0;
  //        int goalNumberOfImages = 50;
          
          
-      }
+//      }
 	// Returns a new image that is a cropped version of the original image.
 IplImage* SegbotProcessor::cropImage(const IplImage *img, const CvRect region) {
+	    ROS_DEBUG("In cropImage");
 	    IplImage *imageTmp;
 	    IplImage *imageRGB;
 	    CvSize size;
@@ -52,12 +53,17 @@ IplImage* SegbotProcessor::cropImage(const IplImage *img, const CvRect region) {
         }
 
 Mat SegbotProcessor::preProcessImage(Mat frame) {
+		ROS_DEBUG("In preProcessImage\n");
                 cv::Mat frame_gray;
+		ROS_DEBUG("grayscaleing the image\n");
                 cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
+		ROS_DEBUG("equalizing the image\n");
                 cv::equalizeHist( frame_gray, frame_gray );
-
+		return frame_gray;
 }
+
 void SegbotProcessor::detectAndDisplay( Mat frame ) {
+        	ROS_DEBUG("In detect and Display\n");
 		// Preprocess
 		//cv::Mat frame_gray;
  		//cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
@@ -80,8 +86,10 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			std::vector<Rect> eyes;
 			eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
 			//For Each Face with Eyes
+			visible_faces.erase(visible_faces.begin(), visible_faces.end());
 			//By only working with faces with eyes we ensure fewer false positives
 			for(size_t j = 0; j < eyes.size(); j++) {
+				ROS_INFO("I SEE A FACE!\n");
 				// Find the center
 				// NOTE: Only neccisary for displaying
 				cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
@@ -112,41 +120,48 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
          			}
 	
 
-			//TODO: IF COUNT > 0, SAVE THE FACES UNDER NAME, AND DECREMENT
-			//TODO: Save all faces to variable (write getter, so recognize faces can get it at any time) -- do I need a lock on this?
-
-			//Check if the person's folder exists already
-			struct stat sb;
-			if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {
-				//Folder does not exist already
-				//Make a folder
-				ROS_INFO("Createing a folder for images %s \n", face_name.c_str());
-				mkdir((data_folder + face_name).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-			} else if (face_pic_num == 0) {
-				//Folder exists, so it might have files in it we dont want to overwite, so we must count the files in it
-				DIR *dp;
-				struct dirent *ep;
-				dp = opendir( (data_folder + face_name).c_str());
-				while (ep = readdir (dp))
-					face_pic_num++;
-				(void) closedir(dp);
+			ROS_DEBUG("Checking if the faces should be saved\n");
+			// If count > 0, save the faces under the name, and decrement the counter
+			if (count > 0) {
+				count = count - 1;
+				//Check if the person's folder exists already
+				struct stat sb;
+				if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {
+					//Folder does not exist already
+					//Make a folder
+					ROS_INFO("Createing a folder for images %s \n", face_name.c_str());
+					mkdir((data_folder + face_name).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+				}  else if (face_pic_num == 0) {
+					//Folder exists, so it might have files in it we dont want to overwite, so we must count the files in it
+					DIR *dp;
+					struct dirent *ep;
+					dp = opendir( (data_folder + face_name).c_str());
+					while (ep = readdir (dp))
+						face_pic_num++;
+					(void) closedir(dp);
+				}
+				//Save croped image to faces data in their folder
+				//ensure sequential naming of photos,
+				//even if there are already photos in the folder
+				ROS_INFO("Saveing face %i \n", face_pic_num);
+				String image_name = data_folder + face_name + "/" + std::to_string(face_pic_num) + ".pgm";
+				face_pic_num = face_pic_num + 1;
+				imwrite(image_name, small_img);//save image
 			}
-			//Save croped image to faces data in their folder
-			//ensure sequential naming of photos,
-			//even if there are already photos in the folder
-			ROS_INFO("Saveing face %i \n", face_pic_num);
-			String image_name = data_folder + face_name + "/" + std::to_string(face_pic_num) + ".pgm";
-			face_pic_num = face_pic_num + 1;
-			imwrite(image_name, small_img);//save image
-			}
-  		}
+			ROS_DEBUG("Saving images for face_recognition\n");
+			//Save all faces to variable
+			visible_faces.push_back(small_img);
+		}
+  	}
   		
 		// Display Results
+		ROS_DEBUG("Displaying Results");
   		imshow( "test", frame );
   		waitKey(10);    
  	}
 
 void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
+       	 	ROS_DEBUG("In callback\n");
 		if (!processing) {
 			_kill_idle();
 			return;
@@ -162,11 +177,13 @@ void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
 		detectAndDisplay(cv_ptr->image.clone());
 	}
 
-SegbotProcessor::SegbotProcessor(NodeHandle& nh, string name) : it(nh) {
+SegbotProcessor::SegbotProcessor(NodeHandle& nh) : it(nh) {
+		ROS_DEBUG("In face detection constructor\n");
 		processing = true;
 		image_sub = it.subscribe("/camera/rgb/image_raw", 1, &SegbotProcessor::callback, this);
+		count = 0;
 
-		face_name = name;
+		face_name = "";
 		face_cascade.load( face_cascade_name );
 		eyes_cascade.load( eyes_cascade_name );
 	}
@@ -192,15 +209,26 @@ void SegbotProcessor::_kill_idle() {
 			return;
 		}
 }
-	
 
-void detect_face(string name) {
+	void SegbotProcessor::collect_training_faces(string name) {
+		ROS_INFO("In collect_training_faces\n");
+		face_name = name;
+		count = MAX_COUNT;
+	}
+	
+	vector<Mat> SegbotProcessor::get_visible_faces() {
+		ROS_INFO("In get visible faces\n");
+		return visible_faces;
+	}
+//This should no longer be neccisary....
+/*
+void detect_face( {
 	
 	NodeHandle nh;
 	client = new SoundClient;
 	namedWindow( "test", WINDOW_AUTOSIZE );
 
-	SegbotProcessor sp(nh, name);
+	SegbotProcessor sp(nh);
 	spin();
 	destroyWindow("cam");
 
@@ -208,3 +236,4 @@ void detect_face(string name) {
 
 	return;
 }
+*/

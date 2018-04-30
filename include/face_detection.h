@@ -48,9 +48,11 @@ class SegbotProcessor {
 		const string data_folder = "/home/turtlebot/catkin_ws/src/greeter_robot/data/";
 		const String face_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_frontalface_default.xml";
 		const String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_eye.xml";
+		const int MAX_COUNT = 25;
 
-
-      		bool processing = true;
+		int count;
+		vector<Mat> visible_faces;
+      		bool processing;
       		image_transport::ImageTransport it;
       		image_transport::Subscriber image_sub;
       		cv::CascadeClassifier face_cascade;
@@ -68,10 +70,12 @@ class SegbotProcessor {
 		void detectAndDisplay( Mat frame );
 		void callback(const sensor_msgs::ImageConstPtr& msg);
 	public:
-		SegbotProcessor(NodeHandle& nh, string name);
+		SegbotProcessor(NodeHandle& nh);
 		~SegbotProcessor();
 		void _idle();
 		void _kill_idle();
+		void collect_training_faces(string name);
+		vector<Mat> get_visible_faces();
 
 };
 

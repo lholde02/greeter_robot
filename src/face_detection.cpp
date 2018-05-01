@@ -15,6 +15,8 @@ bool idle = true;
 vector<pair<Rect, string>> prevFaces;
 cv::Mat frame;
 
+int count = 0;
+
 //void SegbotProcessor::retrieveFaces () {
 //         int numberOfImages = 0;
  //        int goalNumberOfImages = 50;
@@ -121,9 +123,9 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 	
 
 			ROS_DEBUG("Checking if the faces should be saved\n");
-			// If count > 0, save the faces under the name, and decrement the counter
-			if (count > 0) {
-				count = count - 1;
+			// If num_training_images > 0, save the faces under the name, and decrement the counter
+			if (num_training_images > 0) {
+				num_training_images = num_training_images - 1;
 				//Check if the person's folder exists already
 				struct stat sb;
 				if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {
@@ -150,8 +152,22 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			}
 			ROS_DEBUG("Saving images for face_recognition\n");
 			//Save all faces to variable
-			visible_faces.push_back(small_img);
+			//visible_faces.push_back(small_img);
 			//TODO: PUBLISH SMALL_IMG MAT TO FACE DETECTION
+
+			ros::Publisher detection_pub = nh.advertise<sensor_msgs::Image>("face_detection", 1000);
+
+			sensor_msgs::Image msg;
+
+			cv_bridge::CvImage cvi_mat;
+			cvi_mat.encoding = sensor_msgs::image_encodings::MONO8;
+			cvi_mat.image = small_img;
+			cvi_mat.toImageMsg(msg);
+
+			detection_pub.publish(msg);
+
+			ros::spinOnce();
+			count++;
 		}
   	}
   		
@@ -188,7 +204,7 @@ SegbotProcessor::SegbotProcessor(NodeHandle& nh) : it(nh) {
 		//	INCREMENT COUNT BY 25
 		processing = true;
 		image_sub = it.subscribe("/camera/rgb/image_raw", 1, &SegbotProcessor::callback, this);
-		count = 0;
+		num_training_images = 0;
 
 		face_name = "";
 		face_cascade.load( face_cascade_name );
@@ -220,7 +236,7 @@ void SegbotProcessor::_kill_idle() {
 	void SegbotProcessor::collect_training_faces(string name) {
 		ROS_INFO("In collect_training_faces\n");
 		face_name = name;
-		count = MAX_COUNT;
+		num_training_images = MAX_COUNT;
 	}
 	
 	vector<Mat> SegbotProcessor::get_visible_faces() {

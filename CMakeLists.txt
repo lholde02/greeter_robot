@@ -27,14 +27,25 @@ catkin_package(
 
 include_directories(include/ ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
-add_executable(greeter_robot_runner
+add_executable(greeter_robot_recognition
 	src/storage.cpp
 	src/fps.cpp
 	src/image_proc.cpp
 	src/text.cpp
-	src/main.cpp
-	src/face_detection.cpp
+	src/main_recognition.cpp
 	src/face_recognition.cpp
 )
-add_dependencies(greeter_robot_runner ${catkin_EXPORTED_TARGETS})
-target_link_libraries(greeter_robot_runner ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+add_dependencies(greeter_robot_recognition ${catkin_EXPORTED_TARGETS})
+target_link_libraries(greeter_robot_recognition ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(greeter_robot_detection
+        src/storage.cpp
+        src/fps.cpp
+        src/image_proc.cpp
+        src/text.cpp
+        src/main_detection.cpp
+        src/face_detection.cpp
+)
+add_dependencies(greeter_robot_detection ${catkin_EXPORTED_TARGETS})
+target_link_libraries(greeter_robot_detection ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+

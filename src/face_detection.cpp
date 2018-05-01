@@ -151,6 +151,7 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			ROS_DEBUG("Saving images for face_recognition\n");
 			//Save all faces to variable
 			visible_faces.push_back(small_img);
+			//TODO: PUBLISH SMALL_IMG MAT TO FACE DETECTION
 		}
   	}
   		
@@ -179,6 +180,12 @@ void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
 
 SegbotProcessor::SegbotProcessor(NodeHandle& nh) : it(nh) {
 		ROS_DEBUG("In face detection constructor\n");
+		//TODO: CREATE PUBLISHER OF FACE DETECTION
+		// 	CREATE MAT MESSAGE AND SEND
+		//	PUBLISH FACES AT TODO IN DETECT AND DISPLAY
+		//TODO: SUBSCRIBE TO FACE_RECOGNITION
+		//	MAKE CALLBACK FUNCTION THAT CHANGES NAME,
+		//	INCREMENT COUNT BY 25
 		processing = true;
 		image_sub = it.subscribe("/camera/rgb/image_raw", 1, &SegbotProcessor::callback, this);
 		count = 0;

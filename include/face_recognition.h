@@ -26,5 +26,5 @@ class Face_Recognition {
            void read_csv();
 	public:
 	   int recognize_faces();
-	   Face_Recognition(SegbotProcessor *face_detection_instance);
+	   Face_Recognition();
 };

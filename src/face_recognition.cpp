@@ -66,6 +66,7 @@ int Face_Recognition::recognize_faces() {
     int predictedLabel = -1;
     double confidence = 0.0;
     ROS_DEBUG("Getting visible faces\n");
+    //TODO: SUBSCRIBE TO FACE_DETECTION HERE?
     vector<Mat> visible_faces = face_detection->get_visible_faces();
     for (int i = 0; i < visible_faces.size(); i++){
 	model->predict(visible_faces[i], predictedLabel, confidence);
@@ -86,10 +87,11 @@ int Face_Recognition::recognize_faces() {
     return predictedLabel;
 }
 
-Face_Recognition::Face_Recognition(SegbotProcessor *face_detection_instance) {
+Face_Recognition::Face_Recognition() {
     ROS_DEBUG("In face recognition constructor\n");
     ROS_DEBUG("setting face detection instance\n");
-    face_detection = face_detection_instance;
+    //face_detection = face_detection_instance;
+    //TODO: SUBSCRIBE TO FACIAL DETECTION!!
     // Read in the data. This can fail if no valid
     // input filename is given.
     try {

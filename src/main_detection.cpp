@@ -3,6 +3,7 @@
 #include <opencv2/contrib/contrib.hpp>
 
 int main(int argc, char** argv) {
+	ROS_INFO("Starting Facial Detection\n");
 	init(argc, argv, "greeter_robot_detection");
 	printf("CXX Standard:   %li\n", __cplusplus);
 	printf("OpenCV Version: %s\n", CV_VERSION);

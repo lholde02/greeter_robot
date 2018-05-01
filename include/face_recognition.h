@@ -12,19 +12,20 @@ using namespace std;
 
 class Face_Recognition {
 	private:
-	   const double IMAGE_WIDTH = 100;
- 	   const double IMAGE_HEIGHT = 100;
-	   const string fn_csv = "/home/turtlebot/catkin_ws/src/greeter_robot/data/faces.csv";
-           const char csv_separator = ';';
-	   SegbotProcessor *face_detection;
-           vector<Mat> images;
-           vector<int> labels;
-	   int height;
-	   vector<Mat> testSample; //TODO: REMOVE
-	   vector<int> testLabel; //TODO: REMOVE
-	   Ptr<FaceRecognizer> model;
-           void read_csv();
+		const double IMAGE_WIDTH = 100;
+ 		const double IMAGE_HEIGHT = 100;
+		const string fn_csv = "/home/turtlebot/catkin_ws/src/greeter_robot/data/faces.csv";
+		const char csv_separator = ';';
+		Mat face_image;
+		bool fresh_face;
+		int height;
+		vector<Mat> images;
+		vector<int> labels;
+		//vector<Mat> testSample; //TODO: REMOVE
+		//vector<int> testLabel; //TODO: REMOVE
+		Ptr<FaceRecognizer> model;
+		void read_csv();
 	public:
-	   int recognize_faces();
-	   Face_Recognition();
+		int recognize_faces();
+		Face_Recognition();
 };

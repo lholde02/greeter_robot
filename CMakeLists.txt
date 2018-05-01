@@ -21,7 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
 	INCLUDE_DIRS include/ ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}
-	CATKIN_DEPENDS actionlib std_msgs
+	CATKIN_DEPENDS actionlib std_msgs message_runtime
 )
 
 # BUILD

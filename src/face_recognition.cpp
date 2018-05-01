@@ -66,21 +66,21 @@ int Face_Recognition::recognize_faces() {
     int predictedLabel = -1;
     double confidence = 0.0;
     ROS_DEBUG("Getting visible faces\n");
-    //TODO: SUBSCRIBE TO FACE_DETECTION HERE?
-    vector<Mat> visible_faces = face_detection->get_visible_faces();
-    for (int i = 0; i < visible_faces.size(); i++){
-	model->predict(visible_faces[i], predictedLabel, confidence);
-        ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
-        ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
+    //TODO: SUBSCRIBE TO FACE_DETECTION HERE? AND UNCOMMENT
+    //vector<Mat> visible_faces = face_detection->get_visible_faces();
+    //for (int i = 0; i < visible_faces.size(); i++){
+//	model->predict(visible_faces[i], predictedLabel, confidence);
+//        ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
+//        ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
 
-    }
-/*
+//    }
+
     for (int i = 0; i < testSample.size(); i++) {
     	model->predict(testSample[i], predictedLabel, confidence);
         ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
         ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
     }
-*/
+
     //TODO: Write code to get name given label    
     //TODO: RETURN ALL PERDICTED LABELS
     ROS_DEBUG("Returning the last predictive lable: %i \n", predictedLabel);

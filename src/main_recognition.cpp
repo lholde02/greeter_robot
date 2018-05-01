@@ -1,6 +1,8 @@
 #include "face_detection.h"
 #include "face_recognition.h"
 #include <opencv2/contrib/contrib.hpp>
+#include "std_msgs/String.h"
+#include <sstream>
 
 int main(int argc, char** argv) {
 	init(argc, argv, "greeter_robot_recognition");
@@ -13,16 +15,6 @@ int main(int argc, char** argv) {
 
 	ROS_INFO("Making an instance of face recognition\n");
         Face_Recognition face_recognition = Face_Recognition();
-
-                //ROS_INFO("Attempting to recognize a face\n");
-                int label = face_recognition.recognize_faces();
-                if (label < 0) {
-                        ROS_DEBUG("No person seen, repeat again!\n");
-                } else {
-                        ROS_INFO("Hello person %i\n!", label);
-                        break;
-                }
-
 
 	while (ros::ok()) {
 		ROS_INFO("Attempting to recognize a face\n");

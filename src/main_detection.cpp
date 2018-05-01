@@ -17,9 +17,8 @@ int main(int argc, char** argv) {
 	ROS_DEBUG("Creating a test window");
         namedWindow( "test", WINDOW_AUTOSIZE );
 	ROS_INFO("Createing an instance of the face recognition class\n");
-        SegbotProcessor sp(nh);
+        SegbotProcessor sp(nh, argc, argv);
 	spin();
-
 	ROS_INFO("Destroying the window\n");
         destroyWindow("cam");
 	free(client);

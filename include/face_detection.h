@@ -34,6 +34,8 @@
 #include "image_proc.h"
 #include "fps.h"
 
+#include "std_msgs/String.h"
+
 using namespace tf;
 using namespace std;
 using namespace ros;
@@ -52,6 +54,11 @@ class SegbotProcessor {
 
 		int count;
 		vector<Mat> visible_faces;
+		
+		//Subscriber to face recognition
+		ros::Subscriber recognition_sub;
+
+		//Subscriber to camera data
       		bool processing;
       		image_transport::ImageTransport it;
       		image_transport::Subscriber image_sub;
@@ -69,8 +76,9 @@ class SegbotProcessor {
 		Mat preProcessImage(Mat frame);
 		void detectAndDisplay( Mat frame );
 		void callback(const sensor_msgs::ImageConstPtr& msg);
+		void recognitionCallback(const std_msgs::String::ConstPtr& msg);
 	public:
-		SegbotProcessor(NodeHandle& nh);
+		SegbotProcessor(NodeHandle& nh, int argc, char** argv);
 		~SegbotProcessor();
 		void _idle();
 		void _kill_idle();

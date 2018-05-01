@@ -1,0 +1,7 @@
+<!-- Greeter Robot Launch File -->
+<launch>
+	<!-- Launch tbot2.launch-->
+	<include file="$(find tbot2_launch)/launch/tbot2.launch"></include>
+ 	<node name="greeter_robot_detection" pkg="greeter_robot" type="greeter_robot_detection"></node>
+	<node name="greeter_robot_recognition" pkg="greeter_robot" type="greeter_robot_recognition"></node>
+</launch>

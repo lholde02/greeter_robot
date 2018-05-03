@@ -1,6 +1,7 @@
 #include "face_detection.h"
 #include "face_recognition.h"
 #include <opencv2/contrib/contrib.hpp>
+
 /*
  * Copyright (c) 2011. Philipp Wagner <bytefish[at]gmx[dot]de>.
  * Released to public domain under terms of the BSD Simplified license.
@@ -82,7 +83,22 @@ void Face_Recognition::recognizer_callback(const sensor_msgs::Image::ConstPtr& m
 	face_image = mat;
 	fresh_face = true;
 }
-
+void Face_Recognition::retrieve_labels() {
+    std::ifstream file(label_csv.c_str(), ifstream::in);
+    if (!file) {
+        string error_message = "No valid labels.csv file found";
+        CV_Error(CV_StsBadArg, error_message);
+    }
+    string line, label, name;
+    while (getline(file, line)) {
+      stringstream liness(line);
+      getline(liness, label, csv_separator);
+      getline(liness, name);
+      if (!label.empty() && !name.empty()) {
+        label_to_name.push_back(name); //Pushes the names in order
+      }
+    }
+}
 
 Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
 	ROS_INFO("In face recognition constructor\n");
@@ -92,6 +108,7 @@ Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
  	// Read in the data.
     	try {
         	read_csv();
+		retrieve_labels(); 
     	} catch (cv::Exception& e) {
         	cerr << "Error opening file \"" << fn_csv << "\". Reason: " << e.msg << endl;
         	// nothing more we can do

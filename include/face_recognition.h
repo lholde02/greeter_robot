@@ -16,6 +16,7 @@ class Face_Recognition {
  		const double IMAGE_HEIGHT = 100;
 		const string fn_csv = "/home/turtlebot/catkin_ws/src/greeter_robot/data/faces.csv";
 		const char csv_separator = ';';
+		image_transport::ImageTransport it;
 		Mat face_image;
 		bool fresh_face;
 		int height;
@@ -25,7 +26,9 @@ class Face_Recognition {
 		//vector<int> testLabel; //TODO: REMOVE
 		Ptr<FaceRecognizer> model;
 		void read_csv();
+		ros::Subscriber detection_sub;
+		void recognizer_callback(const sensor_msgs::Image::ConstPtr& msg);
 	public:
 		int recognize_faces();
-		Face_Recognition();
+		Face_Recognition(NodeHandle n);
 };

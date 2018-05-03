@@ -9,6 +9,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <sstream>
+#include <iostream>
+#include <fstream>
+
+#include <ros/ros.h>
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include "tf/tf.h"
 #include "tf/transform_listener.h"
@@ -51,8 +61,9 @@ class SegbotProcessor {
 		const String face_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_frontalface_default.xml";
 		const String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_eye.xml";
 		const int MAX_COUNT = 25;
-
 		int count;
+
+		int num_training_images;
 		vector<Mat> visible_faces;
 		
 		//Subscriber to face recognition
@@ -77,6 +88,7 @@ class SegbotProcessor {
 		void detectAndDisplay( Mat frame );
 		void callback(const sensor_msgs::ImageConstPtr& msg);
 		void recognitionCallback(const std_msgs::String::ConstPtr& msg);
+		ros::Publisher detection_pub;
 	public:
 		SegbotProcessor(NodeHandle& nh, int argc, char** argv);
 		~SegbotProcessor();

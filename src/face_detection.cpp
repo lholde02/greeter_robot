@@ -4,7 +4,6 @@ bool idle = true;
 vector<pair<Rect, string>> prevFaces;
 cv::Mat frame;
 
-// Returns a new image that is a cropped version of the original image.
 IplImage* SegbotProcessor::cropImage(const IplImage *img, const CvRect region) {
 	ROS_DEBUG("In cropImage");
 	IplImage *imageTmp;
@@ -14,7 +13,7 @@ IplImage* SegbotProcessor::cropImage(const IplImage *img, const CvRect region) {
 	size.width = img->width;
 
 	if (img->depth != IPL_DEPTH_8U) {
-		ROS_INFO("ERROR in cropImage: Unknown image depth of %d given in cropImage() instead of 8 bits per pixel.", img->depth);
+//		ROS_INFO("ERROR in cropImage: Unknown image depth of %d given in cropImage() instead of 8 bits per pixel.", img->depth);
 		exit(1);
 	}
 
@@ -46,7 +45,7 @@ Mat SegbotProcessor::preProcessImage(Mat frame) {
 }
 
 void SegbotProcessor::detectAndDisplay( Mat frame ) {
-        ROS_INFO("In detect and Display\n");
+//        ROS_INFO("In detect and Display\n");
 	// Preprocess
 	//cv::Mat frame_gray;
  	//cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
@@ -72,7 +71,7 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 		visible_faces.erase(visible_faces.begin(), visible_faces.end());
 		//By only working with faces with eyes we ensure fewer false positives
 		for(size_t j = 0; j < eyes.size(); j++) {
-			ROS_INFO("I SEE A FACE!\n");
+//			ROS_INFO("I SEE A FACE!\n");
 			// Find the center
 			// NOTE: Only neccisary for displaying
 			cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
@@ -89,29 +88,32 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			Mat face_img = Mat(face_img_ptr, true);
 
 			//Resize image
+			Mat small_img;
+			resize(face_img, small_img, Size(100, 100));
 			//TODO: Ensure all images end up 100x100
-       			const int DETECTION_WIDTH = 320;
+			/*
+       			const int DETECTION_WIDTH = 100;
         		Mat small_img;
       			float scale = (face_img.cols / ( (float) DETECTION_WIDTH));
          		if (face_img.cols > DETECTION_WIDTH) {
        				//Shrink the image while keeping the same aspect ratio.
             			int scaledHeight = cvRound(face_img.rows / scale);
-           			resize(face_img, small_img, Size(DETECTION_WIDTH, scaledHeight));
+           			resize(face_img, small_img, Size(100, 100));//DETECTION_WIDTH, scaledHeight));
          		} else {
             			//Acess the input directly since it is already small.
             			small_img = face_img;
          		}
-	
+			*/	
 			ROS_DEBUG("Checking if the faces should be saved\n");
-			// If count > 0, save the faces under the name, and decrement the counter
-			if (count > 0) {
-				count = count - 1;
+			// If num_training_images > 0, save the faces under the name, and decrement the counter
+			if (num_training_images > 0) {
+				num_training_images = num_training_images - 1;
 				//Check if the person's folder exists already
 				struct stat sb;
 				if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {
 					//Folder does not exist already
 					//Make a folder
-					ROS_INFO("Createing a folder for images %s \n", face_name.c_str());
+//					ROS_INFO("Createing a folder for images %s \n", face_name.c_str());
 					mkdir((data_folder + face_name).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 				}  else if (face_pic_num == 0) {
 					//Folder exists, so it might have files in it we dont want to overwite, so we must count the files in it
@@ -125,26 +127,41 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 				//Save croped image to faces data in their folder
 				//ensure sequential naming of photos,
 				//even if there are already photos in the folder
-				ROS_INFO("Saveing face %i \n", face_pic_num);
+//				ROS_INFO("Saveing face %i \n", face_pic_num);
 				String image_name = data_folder + face_name + "/" + std::to_string(face_pic_num) + ".pgm";
 				face_pic_num = face_pic_num + 1;
 				imwrite(image_name, small_img);//save image
 			}	
 			ROS_DEBUG("Saving images for face_recognition\n");
 			//Save all faces to variable
-			visible_faces.push_back(small_img);
+			//visible_faces.push_back(small_img);
 			//TODO: PUBLISH SMALL_IMG MAT TO FACE DETECTION
+
+			//Publisher: will publish mat images in a sensor_msg::Image format, must be converted back on recieving end
+//			ROS_INFO("Publishing images for recognition\n");
+			sensor_msgs::Image msg;
+
+			cv_bridge::CvImage cvi_mat;
+			cvi_mat.encoding = sensor_msgs::image_encodings::MONO8;
+			cvi_mat.image = small_img;
+			cvi_mat.toImageMsg(msg);
+
+			detection_pub.publish(msg);
+
+			ros::spinOnce();
+			//sleep(1);
+			count++;
 		}
   	}
   		
 	// Display Results
-	ROS_DEBUG("Displaying Results");
+//	ROS_INFO("Displaying Results");
   	imshow( "test", frame );
   	waitKey(10);    
  }
 
 void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
-	ROS_INFO("In callback\n");
+//	ROS_INFO("In segbot processor callback\n");
 	if (!processing) {
 		_kill_idle();
 		return;
@@ -156,11 +173,12 @@ void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 		return;
 	}
+//	ROS_INFO("calling detect and display");
 	detectAndDisplay(cv_ptr->image.clone());
 }
 
 void SegbotProcessor::recognitionCallback(const std_msgs::String::ConstPtr& msg) {
-	ROS_INFO("Face Detection heard the name %s", msg->data.c_str());
+//	ROS_INFO("Face Detection heard the name %s", msg->data.c_str());
 	face_name = msg->data.c_str();
 	count = MAX_COUNT;	
 }
@@ -173,7 +191,7 @@ SegbotProcessor::SegbotProcessor(NodeHandle& nh, int argc, char** argv) : it(nh)
 
 	//Subscribe to face recognition data
 	ros::init(argc, argv, "recognition_listener");
-	recognition_sub = nh.subscribe("face_recognition", 1000, &SegbotProcessor::recognitionCallback, this);
+	recognition_sub = nh.subscribe("face_recognition", 1, &SegbotProcessor::recognitionCallback, this);
 	//TODO: DO I REALLY NEED TO spin() HERE?
 
 	//Subscribe to camera data
@@ -184,6 +202,8 @@ SegbotProcessor::SegbotProcessor(NodeHandle& nh, int argc, char** argv) : it(nh)
 	face_name = "";
 	face_cascade.load( face_cascade_name );
 	eyes_cascade.load( eyes_cascade_name );
+
+	detection_pub = nh.advertise<sensor_msgs::Image>("face_detection", 1);
 }
 	
 SegbotProcessor::~SegbotProcessor() {
@@ -198,23 +218,23 @@ void SegbotProcessor::_idle() {
 }
 	
 void SegbotProcessor::_kill_idle() {
-	lastIdle = -1;
-	first = true;
-	
-	printf("cancelling goals\n");
-	
-	if (killed) {
-		return;
-	}
+		lastIdle = -1;
+		first = true;
+		
+		printf("cancelling goals\n");
+		
+		if (killed) {
+			return;
+		}
 }
 
 void SegbotProcessor::collect_training_faces(string name) {
-	ROS_INFO("In collect_training_faces\n");
+//	ROS_INFO("In collect_training_faces\n");
 	face_name = name;
 	count = MAX_COUNT;
 }
 
 vector<Mat> SegbotProcessor::get_visible_faces() {
-	ROS_DEBUG("In get visible faces\n");
+//	ROS_DEBUG("In get visible faces\n");
 	return visible_faces;
 }

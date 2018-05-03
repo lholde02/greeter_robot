@@ -2,6 +2,6 @@
 <launch>
 	<!-- Launch tbot2.launch-->
 	<include file="/home/turtlebot/catkin_ws/src/tufts_service_robots/tbot2_launch/launch/tbot2.launch" />
- 	<node name="greeter_robot_detection" pkg="greeter_robot" type="greeter_robot_detection" output="screen"></node>
-	<node name="greeter_robot_recognition" pkg="greeter_robot" type="greeter_robot_recognition" output="screen"></node>
+	<node name="greeter_robot_recognition" pkg="greeter_robot" type="greeter_robot_recognition" required="true" output="screen"/>
+ 	<node name="greeter_robot_detection" pkg="greeter_robot" type="greeter_robot_detection" required="true" output="screen"/>
 </launch>

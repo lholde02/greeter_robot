@@ -55,12 +55,10 @@ void Face_Recognition::read_csv() {
 }
 
 int Face_Recognition::recognize_faces() {
-	ROS_DEBUG("In recognize faces\n");
+	ROS_INFO("In recognize faces\n");
 	// predict the face in an image with the confidence
     	int predictedLabel = -10; //-10 == no face, -1 == unknown, >= 0 is a person label
     	double confidence = 0.0;
-    	ROS_DEBUG("Getting visible faces\n");
-	fresh_face = false;
 	if (fresh_face == true) { //We have gotten a new face to analyze
 		model->predict(face_image, predictedLabel, confidence);
 		ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
@@ -76,10 +74,21 @@ int Face_Recognition::recognize_faces() {
     	return predictedLabel;
 }
 
-Face_Recognition::Face_Recognition() {
-	ROS_DEBUG("In face recognition constructor\n");
-	ROS_DEBUG("setting face detection instance\n");
+void Face_Recognition::recognizer_callback(const sensor_msgs::Image::ConstPtr& msg) {
+	ROS_INFO("In recognizer_callback\n");
+    	cv_bridge::CvImagePtr img;
+    	img = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8); // container of type sensor_msgs/Image
+    cv::Mat mat = img->image;
+	face_image = mat;
+	fresh_face = true;
+}
+
+
+Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
+	ROS_INFO("In face recognition constructor\n");
+	ROS_INFO("setting face detection instance\n");
  	//TODO: SUBSCRIBE TO FACIAL DETECTION!!
+	detection_sub = n.subscribe("face_detection", 1000, &Face_Recognition::recognizer_callback, this);
  	// Read in the data.
     	try {
         	read_csv();

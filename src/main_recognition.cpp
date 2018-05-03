@@ -14,13 +14,13 @@ int main(int argc, char** argv) {
 	int count = 0;
 
 	ROS_INFO("Making an instance of face recognition\n");
-        Face_Recognition face_recognition = Face_Recognition();
+        Face_Recognition face_recognition = Face_Recognition(n);
 
 	while (ros::ok()) {
 		ROS_INFO("Attempting to recognize a face\n");
                 int label = face_recognition.recognize_faces();
                 if (label == -1) {
-                        ROS_DEBUG("Person unknown, learning them\n");
+                        ROS_INFO("Person unknown, learning them\n");
 			std_msgs::String msg;
                         std::stringstream ss;
                         ss << "TODONameHere" << count;

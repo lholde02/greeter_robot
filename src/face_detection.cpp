@@ -56,11 +56,11 @@ IplImage* SegbotProcessor::cropImage(const IplImage *img, const CvRect region) {
 
 Mat SegbotProcessor::preProcessImage(Mat frame) {
 		ROS_DEBUG("In preProcessImage\n");
-                cv::Mat frame_gray;
+        cv::Mat frame_gray;
 		ROS_DEBUG("grayscaleing the image\n");
-                cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
+        cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
 		ROS_DEBUG("equalizing the image\n");
-                cv::equalizeHist( frame_gray, frame_gray );
+        cv::equalizeHist( frame_gray, frame_gray );
 		return frame_gray;
 }
 
@@ -73,7 +73,7 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 		frame = preProcessImage(frame);
 
   		// Detect Faces
-                std::vector<cv::Rect> faces;
+        std::vector<cv::Rect> faces;
   		face_cascade.detectMultiScale( frame/*_gray*/, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
 		
 		//For Each Face
@@ -155,6 +155,7 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			//visible_faces.push_back(small_img);
 			//TODO: PUBLISH SMALL_IMG MAT TO FACE DETECTION
 
+			//Publisher: will publish mat images in a sensor_msg::Image format, must be converted back on recieving end
 			ros::Publisher detection_pub = nh.advertise<sensor_msgs::Image>("face_detection", 1000);
 
 			sensor_msgs::Image msg;

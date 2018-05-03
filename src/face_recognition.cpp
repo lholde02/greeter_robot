@@ -67,7 +67,11 @@ int Face_Recognition::recognize_faces() {
     double confidence = 0.0;
     ROS_DEBUG("Getting visible faces\n");
     //TODO: SUBSCRIBE TO FACE_DETECTION HERE?
-    vector<Mat> visible_faces = face_detection->get_visible_faces();
+
+    ros::NodeHandle n;
+    ros::Subscriber recognizer_sub = n.subscribe("face_recognition", 1000, recognizer_callback);
+
+    //vector<Mat> visible_faces = face_detection->get_visible_faces();
     for (int i = 0; i < visible_faces.size(); i++){
 	model->predict(visible_faces[i], predictedLabel, confidence);
         ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
@@ -86,6 +90,13 @@ int Face_Recognition::recognize_faces() {
     ROS_DEBUG("Returning the last predictive lable: %i \n", predictedLabel);
     return predictedLabel;
 }
+
+void recognizer_callback(const sensor_msgs::Image::ConstPtr& msg) {
+    cv_bridge::CvImagePtr img;
+    img = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8); // container of type sensor_msgs/Image
+    cv::Mat mat = img->image;
+}
+
 
 Face_Recognition::Face_Recognition() {
     ROS_DEBUG("In face recognition constructor\n");

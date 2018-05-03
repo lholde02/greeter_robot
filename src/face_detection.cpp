@@ -156,8 +156,6 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			//TODO: PUBLISH SMALL_IMG MAT TO FACE DETECTION
 
 			//Publisher: will publish mat images in a sensor_msg::Image format, must be converted back on recieving end
-			ros::Publisher detection_pub = nh.advertise<sensor_msgs::Image>("face_detection", 1000);
-
 			sensor_msgs::Image msg;
 
 			cv_bridge::CvImage cvi_mat;
@@ -210,6 +208,8 @@ SegbotProcessor::SegbotProcessor(NodeHandle& nh) : it(nh) {
 		face_name = "";
 		face_cascade.load( face_cascade_name );
 		eyes_cascade.load( eyes_cascade_name );
+
+		detection_pub = nh.advertise<sensor_msgs::Image>("face_detection", 1000);
 	}
 	
 SegbotProcessor::~SegbotProcessor() {

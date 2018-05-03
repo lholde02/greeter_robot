@@ -68,16 +68,13 @@ int Face_Recognition::recognize_faces() {
     ROS_DEBUG("Getting visible faces\n");
     //TODO: SUBSCRIBE TO FACE_DETECTION HERE?
 
-    ros::NodeHandle n;
-    ros::Subscriber recognizer_sub = n.subscribe("face_recognition", 1000, recognizer_callback);
-
     //vector<Mat> visible_faces = face_detection->get_visible_faces();
-    for (int i = 0; i < visible_faces.size(); i++){
-	model->predict(visible_faces[i], predictedLabel, confidence);
-        ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
-        ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
+    //for (int i = 0; i < visible_faces.size(); i++){
+	//model->predict(visible_faces[i], predictedLabel, confidence);
+    //    ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
+    //    ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
 
-    }
+    //}
 /*
     for (int i = 0; i < testSample.size(); i++) {
     	model->predict(testSample[i], predictedLabel, confidence);
@@ -105,6 +102,8 @@ Face_Recognition::Face_Recognition() {
     //TODO: SUBSCRIBE TO FACIAL DETECTION!!
     // Read in the data. This can fail if no valid
     // input filename is given.
+    recognizer_sub = n.subscribe("face_recognition", 1000, recognizer_callback);
+
     try {
         read_csv();
     } catch (cv::Exception& e) {

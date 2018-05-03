@@ -55,28 +55,30 @@ void Face_Recognition::read_csv() {
 	}
 }
 
-int Face_Recognition::recognize_faces() {
-	ROS_INFO("In recognize faces\n");
+string Face_Recognition::recognize_faces() {
+//	ROS_INFO("In recognize faces\n");
 	// predict the face in an image with the confidence
     	int predictedLabel = -10; //-10 == no face, -1 == unknown, >= 0 is a person label
     	double confidence = 0.0;
 	if (fresh_face == true) { //We have gotten a new face to analyze
 		model->predict(face_image, predictedLabel, confidence);
-		ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
-		ROS_INFO("This was predicted with a confidence level of %lf \n", confidence);
+//		ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
+		ROS_INFO("The following was predicted with a confidence level of %lf :\n", confidence);
 		fresh_face = false;
 	}
 	
-	if (predictedLabel >= 0 && confidence < 100) { //TODO: What confidence value is too low?
-		predictedLabel = -1;
+	if (predictedLabel >= 0 && confidence < 20000) { //TODO: What confidence value is too low?
+		return "unknown";
+	} else if (predictedLabel >= 0) {
+    		//TODO: Write code to get name given label    
+//		ROS_INFO("Label %i translates to %s\n", predictedLabel, label_to_name[predictedLabel].c_str());
+		return label_to_name[predictedLabel].c_str();
 	}
-
-    	//TODO: Write code to get name given label    
-    	return predictedLabel;
+	return "noone";
 }
 
 void Face_Recognition::recognizer_callback(const sensor_msgs::Image::ConstPtr& msg) {
-	ROS_INFO("In recognizer_callback\n");
+//	ROS_INFO("In recognizer_callback\n");
     	cv_bridge::CvImagePtr img;
     	img = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8); // container of type sensor_msgs/Image
     cv::Mat mat = img->image;
@@ -84,6 +86,7 @@ void Face_Recognition::recognizer_callback(const sensor_msgs::Image::ConstPtr& m
 	fresh_face = true;
 }
 void Face_Recognition::retrieve_labels() {
+	ROS_INFO("Lable file: %s\n", label_csv.c_str());
     std::ifstream file(label_csv.c_str(), ifstream::in);
     if (!file) {
         string error_message = "No valid labels.csv file found";
@@ -95,17 +98,19 @@ void Face_Recognition::retrieve_labels() {
       getline(liness, label, csv_separator);
       getline(liness, name);
       if (!label.empty() && !name.empty()) {
+	ROS_INFO("Pushing back name %s", name.c_str());
         label_to_name.push_back(name); //Pushes the names in order
       }
     }
 }
 
 Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
-	ROS_INFO("In face recognition constructor\n");
-	ROS_INFO("setting face detection instance\n");
-	detection_sub = n.subscribe("face_detection", 1000, &Face_Recognition::recognizer_callback, this);
+//	ROS_INFO("In face recognition constructor\n");
+//	ROS_INFO("setting face detection instance\n");
+	detection_sub = n.subscribe("face_detection", 1, &Face_Recognition::recognizer_callback, this);
  	// Read in the data.
     	try {
+		ROS_INFO("Reading both csv files\n");
         	read_csv();
 		retrieve_labels(); 
     	} catch (cv::Exception& e) {
@@ -113,7 +118,7 @@ Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
         	// nothing more we can do
         	exit(1);
     	}
-	ROS_DEBUG("Ensuring there are enough images\n");
+	ROS_INFO("Ensuring there are enough images\n");
  	// Quit if there are not enough images.
    	if(images.size() <= 1) {
         	string error_message = "This demo needs at least 2 images to work. Please add more images to your data set!";

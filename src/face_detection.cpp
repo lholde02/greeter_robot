@@ -45,7 +45,7 @@ Mat SegbotProcessor::preProcessImage(Mat frame) {
 }
 
 void SegbotProcessor::detectAndDisplay( Mat frame ) {
-        ROS_INFO("In detect and Display\n");
+//       ROS_INFO("In detect and Display\n");
 	frame = preProcessImage(frame);
 
   	// Detect Faces
@@ -67,7 +67,7 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 		visible_faces.erase(visible_faces.begin(), visible_faces.end());
 		//By only working with faces with eyes we ensure fewer false positives
 		for(size_t j = 0; j < eyes.size(); j++) {
-			ROS_INFO("I SEE A FACE!\n");
+//			ROS_INFO("I SEE A FACE!\n");
 			// Find the center
 			// NOTE: Only neccisary for displaying
 			cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
@@ -114,10 +114,9 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 				face_pic_num = face_pic_num + 1;
 				imwrite(image_name, small_img);//save image
 			}	
-			ROS_DEBUG("Saving images for face_recognition\n");
 
 			//Publisher: will publish mat images in a sensor_msg::Image format, must be converted back on recieving end
-			ROS_INFO("Publishing images for recognition\n");
+//			ROS_INFO("Publishing images for recognition\n");
 			sensor_msgs::Image msg;
 
 			cv_bridge::CvImage cvi_mat;
@@ -126,20 +125,19 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			cvi_mat.toImageMsg(msg);
 
 			detection_pub.publish(msg);
-
 			ros::spinOnce();
 			count++;
 		}
   	}
   		
 	// Display Results
-	ROS_INFO("Displaying Results");
+//	ROS_INFO("Displaying Results");
   	imshow( "test", frame );
   	waitKey(10);    
  }
 
 void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
-	ROS_INFO("In segbot processor callback\n");
+//	ROS_INFO("In segbot processor callback\n");
 	if (!processing) {
 		_kill_idle();
 		return;
@@ -151,7 +149,7 @@ void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
 		ROS_ERROR("cv_bridge exception: %s", e.what());
 		return;
 	}
-	ROS_INFO("calling detect and display");
+//	ROS_INFO("calling detect and display");
 	detectAndDisplay(cv_ptr->image.clone());
 }
 

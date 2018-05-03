@@ -16,7 +16,7 @@ class Face_Recognition {
  		const double IMAGE_HEIGHT = 100;
 		const string fn_csv = "/home/turtlebot/catkin_ws/src/greeter_robot/data/faces.csv";
 		const char csv_separator = ';';
-		const string label_csv = "faces.csv";
+		const string label_csv = "/home/turtlebot/catkin_ws/src/greeter_robot/data/labels.csv";
 		image_transport::ImageTransport it;
 		Mat face_image;
 		bool fresh_face;
@@ -30,6 +30,6 @@ class Face_Recognition {
 		void retrieve_labels();
 		vector<string> label_to_name;
 	public:
-		int recognize_faces();
+		string recognize_faces();
 		Face_Recognition(NodeHandle n);
 };

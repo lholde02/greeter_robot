@@ -103,7 +103,6 @@ void Face_Recognition::retrieve_labels() {
 Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
 	ROS_INFO("In face recognition constructor\n");
 	ROS_INFO("setting face detection instance\n");
- 	//TODO: SUBSCRIBE TO FACIAL DETECTION!!
 	detection_sub = n.subscribe("face_detection", 1000, &Face_Recognition::recognizer_callback, this);
  	// Read in the data.
     	try {
@@ -125,34 +124,6 @@ Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
 
 	fresh_face = false;
 
-    	//TODO: remove the following when facial recognition gets data from facial detection
-/*
-	for (int i = 0; i < 3; i++) {
-		testSample.push_back(images[images.size() - 1]);
-		testLabel.push_back(labels[labels.size() - 1]);
-		images.pop_back();
-		labels.pop_back();
-	}
-*/
-  	// The following lines create an Eigenfaces model for
-    	// face recognition and train it with the images and
-    	// labels read from the given CSV file.
-    	// This here is a full PCA, if you just want to keep
-    	// 10 principal components (read Eigenfaces), then call
-    	// the factory method like this:
-    	//
-    	//      cv::createEigenFaceRecognizer(10);
-    	//
-    	// If you want to create a FaceRecognizer with a
-    	// confidence threshold (e.g. 123.0), call it with:
-    	//
-    	//      cv::createEigenFaceRecognizer(10, 123.0);
-    	//
-    	// If you want to use _all_ Eigenfaces and have a threshold,
-    	// then call the method like this:
-    	//
-    	//      cv::createEigenFaceRecognizer(0, 123.0);
-    	//
     	ROS_INFO("creating eigenfaces recognizer\n");
     	//Create a Faceial Recognizer
     	model = createEigenFaceRecognizer();

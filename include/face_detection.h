@@ -1,6 +1,5 @@
 #ifndef FACE_DETECTION_H
 #define FACE_DETECTION_H
-//#pragma once
 
 #include <string>
 #include <algorithm>
@@ -62,26 +61,21 @@ class SegbotProcessor {
 		const String eyes_cascade_name = "/home/turtlebot/catkin_ws/src/greeter_robot/classifiers/haarcascade_eye.xml";
 		const int MAX_COUNT = 25;
 		int count;
-
 		int num_training_images;
 		vector<Mat> visible_faces;
-		
 		//Subscriber to face recognition
 		ros::Subscriber recognition_sub;
-
 		//Subscriber to camera data
       		bool processing;
       		image_transport::ImageTransport it;
       		image_transport::Subscriber image_sub;
       		cv::CascadeClassifier face_cascade;
       		cv::CascadeClassifier eyes_cascade;
-
       		bool first = true;
       		bool killed = false;
       		double lastIdle = -1;
   		int face_pic_num = 0;
       		string face_name;
-
       		void retrieveFaces ();
 		IplImage *cropImage(const IplImage *img, const CvRect region);
 		Mat preProcessImage(Mat frame);

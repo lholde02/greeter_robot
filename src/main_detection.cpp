@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 	ROS_DEBUG("Making a node handle\n");
 	NodeHandle nh;
 	ROS_DEBUG("Initizing the sound client\n");
-        client = new SoundClient;
+	client = new SoundClient;
 	ROS_DEBUG("Creating a test window");
         namedWindow( "test", WINDOW_AUTOSIZE );
 	ROS_INFO("Createing an instance of the face recognition class\n");

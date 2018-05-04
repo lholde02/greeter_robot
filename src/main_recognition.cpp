@@ -11,23 +11,11 @@ int main(int argc, char** argv) {
 	printf("OpenCV Version: %s\n", CV_VERSION);
 	
 	ros::NodeHandle n;
+	
+	system("/home/turtlebot/catkin_ws/src/greeter_robot/data/bootandtrain.sh");
 
-/*
-	ros::Publisher robotsound_pub = n.advertise<std_msgs::String>("/sound_play/SoundRequest", 1);
-	sound_play::SoundRequest str;
-	str.arg = "Hello World";
-	robotsound_pub.publish(str);
-*/
-	//SoundClient *soundhandle = new SoundClient;
-	//soundhandle(soundhandle->wavepath + "/R2D2a.wav");
-	//soundhandle->say("Hello World", soundhandle->voice);
-/*
-	SoundClient* soundclient = new sound_play::SoundClient(n, "/sound_play/SoundRequest");
-	soundclient->say("Hello World", "voice_kal_diphone");
-*/	
 	ros::Publisher recognition_pub = n.advertise<std_msgs::String>("face_recognition", 1);
 	ros:Rate loop_rate(10);
-	int count = 0;
 
 //	ROS_INFO("Making an instance of face recognition\n");
         Face_Recognition face_recognition = Face_Recognition(n);
@@ -36,21 +24,37 @@ int main(int argc, char** argv) {
 //		ROS_INFO("Attempting to recognize a face\n");
                 string name = face_recognition.recognize_faces();
                 if (name == "unknown") {
+			system("/home/turtlebot/catkin_ws/src/greeter_robot/data/unknownWelcome.sh");
                         ROS_INFO("Person unknown, learning them\n");
+			string name;
+			cout << "What's your name? ";
+			cin >> name;
+
 			std_msgs::String msg;
-                        std::stringstream ss;
-                        ss << "TODONameHere" << count;
-                        msg.data = ss.str();
+                        msg.data = name;
                         ROS_INFO("%s", msg.data.c_str());
                         recognition_pub.publish(msg);
 			ros::spinOnce();
+			sleep(1);
+			face_recognition.retrain();
+			
+			std::stringstream ss;
+			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcome" <<  name << ".sh";
+			string welcomepath = ss.str();
+			system(welcomepath.c_str());
+
+			//retrain
 
                 } else if (name != "noone") {
                         ROS_INFO("Hello %s\n!", name.c_str());
+			std::stringstream ss;
+			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcome" <<  name << ".sh";
+			string welcomepath = ss.str();
+			system(welcomepath.c_str());
+
 		}
 		ros::spinOnce();
 		loop_rate.sleep();
-		count++;
 	}
 
 	return 0;

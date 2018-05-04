@@ -74,7 +74,7 @@ class SegbotProcessor {
       		bool first = true;
       		bool killed = false;
       		double lastIdle = -1;
-  		int face_pic_num = 0;
+  		int face_pic_num = 0; //The number of images in a folder
       		string face_name;
       		void retrieveFaces ();
 		IplImage *cropImage(const IplImage *img, const CvRect region);

@@ -64,7 +64,6 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 		std::vector<Rect> eyes;
 		eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
 		//For Each Face with Eyes
-		visible_faces.erase(visible_faces.begin(), visible_faces.end());
 		//By only working with faces with eyes we ensure fewer false positives
 		for(size_t j = 0; j < eyes.size(); j++) {
 //			ROS_INFO("I SEE A FACE!\n");
@@ -86,9 +85,10 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			//Resize image
 			Mat small_img;
 			resize(face_img, small_img, Size(100, 100));
-			ROS_DEBUG("Checking if the faces should be saved\n");
+			ROS_INFO("Checking if the faces should be saved\n");
 			// If num_training_images > 0, save the faces under the name, and decrement the counter
 			if (num_training_images > 0) {
+				ROS_INFO("Saving face\n");
 				num_training_images = num_training_images - 1;
 				//Check if the person's folder exists already
 				struct stat sb;
@@ -156,7 +156,7 @@ void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
 void SegbotProcessor::recognitionCallback(const std_msgs::String::ConstPtr& msg) {
 	ROS_INFO("Face Detection heard the name %s", msg->data.c_str());
 	face_name = msg->data.c_str();
-	count = MAX_COUNT;	
+	num_training_images = MAX_COUNT;	
 }
 
 SegbotProcessor::SegbotProcessor(NodeHandle& nh, int argc, char** argv) : it(nh) {

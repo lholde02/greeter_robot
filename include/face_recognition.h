@@ -32,4 +32,5 @@ class Face_Recognition {
 	public:
 		string recognize_faces();
 		Face_Recognition(NodeHandle n);
+		void retrain();
 };

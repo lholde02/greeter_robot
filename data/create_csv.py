@@ -40,8 +40,8 @@ if __name__ == "__main__":
             subject_path = os.path.join(dirname, subdirname)
             for filename in os.listdir(subject_path):
                 abs_path = "%s/%s" % (subject_path, filename)
-	        img = cv2.imread(abs_path, 0);
-		img = cv2.resize(img, (100, 100))
-		cv2.imwrite(abs_path, img);
+	        #img = cv2.imread(abs_path, 0);
+		#img = cv2.resize(img, (100, 100))
+		#cv2.imwrite(abs_path, img);
                 print "%s%s%d" % (abs_path, SEPARATOR, label)
             label = label + 1

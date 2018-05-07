@@ -62,12 +62,12 @@ string Face_Recognition::recognize_faces() {
     	double confidence = 0.0;
 	if (fresh_face == true) { //We have gotten a new face to analyze
 		model->predict(face_image, predictedLabel, confidence);
-		ROS_INFO("The predicted label is %i, which corresponds to a name in the csv \n", predictedLabel);
+		ROS_INFO("The predicted label is %i, which corresponds to the name %s in the csv \n", predictedLabel, label_to_name[predictedLabel].c_str());
 		ROS_INFO("The following was predicted with a confidence level of %lf :\n", confidence);
 		fresh_face = false;
 	}
 	
-	if (predictedLabel >= 0 && confidence > 0 /*30000*/) { //TODO: What confidence value is too low?
+	if (predictedLabel >= 0 && confidence > 2500) { //TODO: What confidence value is too low?
 		return "unknown";
 	} else if (predictedLabel >= 0) {
     		//TODO: Write code to get name given label    
@@ -93,6 +93,7 @@ void Face_Recognition::retrieve_labels() {
         CV_Error(CV_StsBadArg, error_message);
     }
     string line, label, name;
+    label_to_name.clear();
     while (getline(file, line)) {
       stringstream liness(line);
       getline(liness, label, csv_separator);
@@ -139,7 +140,8 @@ Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
 }
 
 void Face_Recognition::retrain() {
-	system("home/turtlebot/catkin_ws/src/greeter_robot/data/retrain.sh");
+	ROS_INFO("Attempting to retrain\n");
+	system("/home/turtlebot/catkin_ws/src/greeter_robot/data/retrain.sh");
 	read_csv();
 	retrieve_labels();
 	model->train(images, labels);

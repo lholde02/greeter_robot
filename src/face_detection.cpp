@@ -69,11 +69,11 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 //			ROS_INFO("I SEE A FACE!\n");
 			// Find the center
 			// NOTE: Only neccisary for displaying
-			cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
+			//cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
 			// Draw a circle around the eyes
 			// NOTE: (Only neccisary for displaying
-       			int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
-       			circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
+       			//int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+       			//circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
 				
 			//  Crop to just an image of that face
 			// TODO: Move conversion into crop
@@ -85,19 +85,24 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 			//Resize image
 			Mat small_img;
 			resize(face_img, small_img, Size(100, 100));
-			ROS_INFO("Checking if the faces should be saved\n");
+//			ROS_INFO("Checking if the faces should be saved\n");
 			// If num_training_images > 0, save the faces under the name, and decrement the counter
+//			ROS_INFO("Number of training images: %i\n", num_training_images);
 			if (num_training_images > 0) {
-				ROS_INFO("Saving face\n");
+//				ROS_INFO("Saving face\n");
 				num_training_images = num_training_images - 1;
 				//Check if the person's folder exists already
 				struct stat sb;
+//				ROS_INFO("Checking if a folder exists\n");
 				if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {
 					//Folder does not exist already
 					//Make a folder
-					ROS_INFO("Createing a folder for images %s \n", face_name.c_str());
+//					ROS_INFO("Createing a folder for images %s \n", face_name.c_str());
 					mkdir((data_folder + face_name).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+					//create welcome
+					system((std::string("bash /home/turtlebot/catkin_ws/src/greeter_robot/data/createwelcome.sh ") + face_name).c_str());
 				}  else if (face_pic_num == 0) {
+//					ROS_INFO("A folder exists\n");
 					//Folder exists, so it might have files in it we dont want to overwite, so we must count the files in it
 					DIR *dp;
 					struct dirent *ep;
@@ -109,7 +114,7 @@ void SegbotProcessor::detectAndDisplay( Mat frame ) {
 				//Save croped image to faces data in their folder
 				//ensure sequential naming of photos,
 				//even if there are already photos in the folder
-				ROS_INFO("Saveing face %i \n", face_pic_num);
+	//			ROS_INFO("Saveing face %i \n", face_pic_num);
 				String image_name = data_folder + face_name + "/" + std::to_string(face_pic_num) + ".pgm";
 				face_pic_num = face_pic_num + 1;
 				imwrite(image_name, small_img);//save image
@@ -154,7 +159,7 @@ void SegbotProcessor::callback(const sensor_msgs::ImageConstPtr& msg) {
 }
 
 void SegbotProcessor::recognitionCallback(const std_msgs::String::ConstPtr& msg) {
-	ROS_INFO("Face Detection heard the name %s", msg->data.c_str());
+//	ROS_INFO("Face Detection heard the name %s", msg->data.c_str());
 	face_name = msg->data.c_str();
 	num_training_images = MAX_COUNT;	
 }
@@ -204,5 +209,9 @@ void SegbotProcessor::collect_training_faces(string name) {
 	ROS_INFO("In collect_training_faces\n");
 	face_name = name;
 	count = MAX_COUNT;
+}
+
+int SegbotProcessor::num_training_images_to_collect() {
+	return num_training_images;
 }
 

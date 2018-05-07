@@ -89,6 +89,7 @@ class SegbotProcessor {
 		void _idle();
 		void _kill_idle();
 		void collect_training_faces(string name);
+		int num_training_images_to_collect();
 		vector<Mat> get_visible_faces();
 
 };

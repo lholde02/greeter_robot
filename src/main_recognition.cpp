@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
 
 //	ROS_INFO("Making an instance of face recognition\n");
         Face_Recognition face_recognition = Face_Recognition(n);
+	face_recognition.retrain();
 
 	while (ros::ok()) {
 //		ROS_INFO("Attempting to recognize a face\n");

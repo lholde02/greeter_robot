@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import os.path
 import cv2
@@ -15,7 +17,7 @@ if __name__ == "__main__":
     SEPARATOR=";"
 
     label = 0
-    file = open('labels.csv', 'w')
+    file = open('/home/turtlebot/catkin_ws/src/greeter_robot/data/labels.csv', 'w')
     for dirname, dirnames, filenames in os.walk(BASE_PATH):
         for subdirname in dirnames:
             file.write("%d%s%s" % (label, SEPARATOR, subdirname))

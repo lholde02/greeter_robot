@@ -1,9 +1,7 @@
-#include "opencv2/core/core.hpp"
-#include <opencv2/contrib/contrib.hpp>
-//#include "opencv2/face/face.hpp"
-//#include "opencv2/highgui/highgui.hpp"
+#ifndef FACE_RECOGNITION_H
+#define FACE_RECOGNITION_H
 
-#include <iostream>
+#include "face_detection.h"
 #include <fstream>
 #include <sstream>
 
@@ -34,3 +32,4 @@ class Face_Recognition {
 		Face_Recognition(NodeHandle n);
 		void retrain();
 };
+#endif

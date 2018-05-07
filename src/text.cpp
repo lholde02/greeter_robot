@@ -1,7 +1,7 @@
-#include "opencv2/opencv.hpp"
+//#include "opencv2/opencv.hpp"
 
-#include "ros/ros.h"
-#include "sound_play/sound_play.h"
+//#include "ros/ros.h"
+//#include "sound_play/sound_play.h"
 
 #include "text.h"
 

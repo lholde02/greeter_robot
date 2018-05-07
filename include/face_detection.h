@@ -1,26 +1,14 @@
 #ifndef FACE_DETECTION_H
 #define FACE_DETECTION_H
 
-#include <string>
-#include <algorithm>
-#include <stdio.h>
-#include <string.h>
+//#include <string>
+//#include <algorithm>
+//#include <stdio.h>
+//#include <string.h>
 #include <sys/stat.h>
-#include <sys/types.h>
+//#include <sys/types.h>
 #include <dirent.h>
-#include <sstream>
-#include <iostream>
-#include <fstream>
-
-#include <ros/ros.h>
-#include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/image_encodings.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-
 #include "tf/tf.h"
-#include "tf/transform_listener.h"
 #include "image_transport/image_transport.h"
 #include "cv_bridge/cv_bridge.h"
 #include "sensor_msgs/image_encodings.h"
@@ -28,21 +16,13 @@
 #include "actionlib/client/action_client.h"
 #include "actionlib/client/simple_action_client.h"
 #include "actionlib/server/simple_action_server.h"
-
 #include "opencv2/opencv.hpp"
-#include "ros/ros.h"
 #include "sound_play/sound_play.h"
-
 #include <opencv2/core/core.hpp>
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-
-#include "text.h"
-#include "storage.h"
 #include "image_proc.h"
-#include "fps.h"
-
 #include "std_msgs/String.h"
 
 using namespace tf;
@@ -94,5 +74,4 @@ class SegbotProcessor {
 
 };
 
-void detect_face(string name);
 #endif

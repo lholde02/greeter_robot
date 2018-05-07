@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FPS_H
+#define FPS_H
 
 #include <time.h>
 
@@ -13,3 +14,4 @@ public:
 	void frame();
 	double getFPS();
 };
+#endif

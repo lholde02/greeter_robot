@@ -1,9 +1,4 @@
-#include "face_detection.h"
 #include "face_recognition.h"
-#include <opencv2/contrib/contrib.hpp>
-#include "std_msgs/String.h"
-#include <sstream>
-
 
 int main(int argc, char** argv) {
 	init(argc, argv, "greeter_robot_recognition");
@@ -16,17 +11,12 @@ int main(int argc, char** argv) {
 
 	ros::Publisher recognition_pub = n.advertise<std_msgs::String>("face_recognition", 1);
 	ros:Rate loop_rate(10);
-
-//	ROS_INFO("Making an instance of face recognition\n");
         Face_Recognition face_recognition = Face_Recognition(n);
-	face_recognition.retrain();
 
 	while (ros::ok()) {
-//		ROS_INFO("Attempting to recognize a face\n");
                 string name = face_recognition.recognize_faces();
                 if (name == "unknown") {
 			system("/home/turtlebot/catkin_ws/src/greeter_robot/data/unknownWelcome.sh");
-                        ROS_INFO("Person unknown, learning them\n");
 			string name;
 			cout << "What's your name? ";
 			cin >> name;
@@ -39,12 +29,10 @@ int main(int argc, char** argv) {
 			sleep(1);
 			face_recognition.retrain();
 			
-			std::stringstream ss;
-			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcome" <<  name << ".sh";
-			string welcomepath = ss.str();
-			system(welcomepath.c_str());
-
-			//retrain
+//			std::stringstream ss;
+//			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcome" <<  name << ".sh";
+//			string welcomepath = ss.str();
+//			system(welcomepath.c_str());
 
                 } else if (name != "noone") {
                         ROS_INFO("Hello %s\n!", name.c_str());

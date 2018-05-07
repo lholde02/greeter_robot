@@ -1,8 +1,8 @@
 #include "storage.h"
 
-#include <vector>
+//#include <vector>
 
-#include "image_proc.h"
+//#include "image_proc.h"
 
 vector<string> used;
 unordered_map<string, Mat> db;

@@ -28,11 +28,6 @@ int main(int argc, char** argv) {
 			ros::spinOnce();
 			sleep(1);
 			face_recognition.retrain();
-			
-//			std::stringstream ss;
-//			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcome" <<  name << ".sh";
-//			string welcomepath = ss.str();
-//			system(welcomepath.c_str());
 
                 } else if (name != "noone") {
                         ROS_INFO("Hello %s\n!", name.c_str());

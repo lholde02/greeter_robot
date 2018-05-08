@@ -52,6 +52,7 @@ Navigating the File Structure
 - **include** - This folder contains some .h files that match the .cpp files containing our code
 - **launch** - This folder contains a launch file for running all of the nodes required for our robot to detect, recognize, greet, and learn faces.
 - **src** - This folder contains the .cpp files that implement the majority of this project. The two files, main_recognition.cpp and main_detection.cpp, respectively create and handle the face_recognition and face_detection nodes. The core functionality for these nodes are stored in face_recognition.cpp and face_detection.cpp respectively. fps.cpp, storage.cpp, text.cpp, and image_proc.cpp are all files that we got from the authors of the Friendly Faces GitHub repo (https://github.com/Noviv/friendly_faces) and implement key subfunctions for our process.
+- **docs** - This folder contains documentation, such as our final project writeup, our final presentation, and our demo video
 
 Authors
 ----------------------------------

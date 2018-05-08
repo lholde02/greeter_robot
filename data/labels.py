@@ -20,8 +20,9 @@ if __name__ == "__main__":
     file = open('/home/turtlebot/catkin_ws/src/greeter_robot/data/labels.csv', 'w')
     for dirname, dirnames, filenames in os.walk(BASE_PATH):
         for subdirname in dirnames:
-            file.write("%d%s%s" % (label, SEPARATOR, subdirname))
-            file.write("\n")
-            label = label + 1
-    file.close()
+	    if subdirname != "welcomemessages":
+                file.write("%d%s%s" % (label, SEPARATOR, subdirname))
+                file.write("\n")
+                label = label + 1
+        file.close()
 

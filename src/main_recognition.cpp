@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 	while (ros::ok()) {
                 string name = face_recognition.recognize_faces();
                 if (name == "unknown") {
-			system("/home/turtlebot/catkin_ws/src/greeter_robot/data/unknownWelcome.sh");
+			system("/home/turtlebot/catkin_ws/src/greeter_robot/data/welcomemessages/unknownWelcome.sh");
 			string name;
 			cout << "What's your name? ";
 			cin >> name;
@@ -26,13 +26,13 @@ int main(int argc, char** argv) {
                         ROS_INFO("%s", msg.data.c_str());
                         recognition_pub.publish(msg);
 			ros::spinOnce();
-			sleep(1);
+			sleep(5);
 			face_recognition.retrain();
 
                 } else if (name != "noone") {
                         ROS_INFO("Hello %s\n!", name.c_str());
 			std::stringstream ss;
-			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcome" <<  name << ".sh";
+			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcomemessages/welcome" <<  name << ".sh";
 			string welcomepath = ss.str();
 			system(welcomepath.c_str());
 

@@ -42,11 +42,14 @@ Installing
 
 Running
 -----------------
-Run the following command:
+Run the following commands:
+**catkin_make ** - Must be run in the catkin_ws directory
 
-**roslaunch greeter_robot greeter_robot_runner**
+**roslaunch launch/greeter_robot.launch**
 
 This launches roscore, the tbot2 launch file created for the Tufts Turtlebots, and our two ROS nodes: facial detection and recognition. The Turtlebot laptop and base must be on before running this command.
+
+Don't forget to compile!!
 
 Navigating the File Structure
 ----------------------------------

@@ -1,7 +1,6 @@
 #include "face_recognition.h"
 
 /*
- * Some code taken from  <http://www.opensource.org/licenses/bsd-license>
  * Copyright (c) 2011. Philipp Wagner <bytefish[at]gmx[dot]de>.
  * Released to public domain under terms of the BSD Simplified license.
  */

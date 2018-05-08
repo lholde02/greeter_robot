@@ -2,6 +2,8 @@ MEET & GREET
 ----------------------------------
 This work explores creating a robot that will recognize and greet people it has met before as well as learn the faces of new people. The purpose of this project was to create a friendly face in a space, specifically Halligan Hall at Tufts University, in order to provide a small comfort to visitors. Our group used a Turtlebot running ROS, an open-source meta-operating system used widely in robotics, as a robot sociable partner. We applied facial detection and recognition to our robot so that it could keep track of the people it 'knows'. Throughout this project, we also referred to work in human-robot interaction to inform design decisions about our robot in order to make it more appealing in the role of greeter.
 
+![Image of the robot identifying one of Leah's eyes](https://github.com/lholde02/greeter_robot/docs/LeahFaceRecognition)
+
 [View our project demo on YouTube](https://www.youtube.com/watch?v=n8Yi51uxvoQ)
 
 Getting Started

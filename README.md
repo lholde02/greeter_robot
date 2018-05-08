@@ -8,6 +8,14 @@ Getting Started
 
 Dependencies
 -----------------
+- Built for a Turtlebot running Ubuntu 14.04
+- OpenCV must be installed, typically already is installed. This package is used to run facial detection and recognition
+- Need to have tufts_service_robots repo installed, https://github.com/jsinapov/tufts_service_robots.git
+- Other packages that are required:
+  * usb_cam for accessing camera images
+  * sound_play for robot speech
+  * tf for some other base functionality
+
 
 Installing
 -----------------
@@ -27,18 +35,21 @@ Running
 -----------------
 Run the following command:
 
-roslaunch greeter_robot greeter_robot_runner
+**roslaunch greeter_robot greeter_robot_runner**
 
 This launches roscore, the tbot2 launch file created for the Tufts Turtlebots, and our two ROS nodes: facial detection and recognition.
 
+Navigating the File Structure
+----------------------------------
+- classifiers - A folder containing different types of classifiers that can be used for facial recognition, stored as .xml files. These files come from the OpenCV library
+- data - This folder contains two python scripts for adjusting the metadata for all the faces the robot can recognize, two csv files containing that metadata, .sh files that produce the greeting sound clips for each person, and subfolders for each person that the robot recognizes. Each folder contains all of the facial images that are stored for that person.
+- include - This folder contains some .h files that match the .cpp files containing our code
+- launch - This folder contains a launch file for running all of the nodes required for our robot to detect, recognize, greet, and learn faces.
+- src - This folder contains the .cpp files that implement the majority of this project. The two files, main_recognition.cpp and main_detection.cpp, respectively create and handle the face_recognition and face_detection nodes. The core functionality for these nodes are stored in face_recognition.cpp and face_detection.cpp respectively. fps.cpp, storage.cpp, text.cpp, and image_proc.cpp are all files that we got from the authors of the Friendly Faces GitHub repo (https://github.com/Noviv/friendly_faces) and implement key subfunctions for our process.
 
 Authors
 ----------------------------------
-Anne Oursler
-
-Leah Holden
-
-Lauren Dierker
+Anne Oursler, Leah Holden, Lauren Dierker
 
 
 Licence
@@ -48,7 +59,7 @@ Released to public domain under terms of the BSD Simplified license.
 <http://www.opensource.org/licenses/bsd-license>
 
 
-Acknolegements
+Acknoledgements
 ----------------------------------
 Thank you to Jivko's former students: Noviv, nj1407, and
 Marcus-Zhu for their friendly faces code

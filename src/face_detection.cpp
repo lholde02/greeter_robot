@@ -96,8 +96,6 @@ void Face_Detection::detectAndDisplay( Mat frame ) {
 					if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {
 						//If the folder does not exist already, make a folder
 						mkdir((data_folder + face_name).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-						//Create welcome message
-						system((std::string("bash /home/turtlebot/catkin_ws/src/greeter_robot/data/createwelcome.sh ") + face_name).c_str());
 					}  else if (face_pic_num == 0) {
 						//Folder exists, so it might have files in it we dont want to overwite, so we must count the files in it
 						DIR *dp;

@@ -4,6 +4,7 @@
 #include "face_detection.h"
 #include <fstream>
 #include <sstream>
+#include <time.h>
 
 using namespace cv;
 using namespace std;
@@ -27,6 +28,8 @@ class Face_Recognition {
 		void recognizer_callback(const sensor_msgs::Image::ConstPtr& msg);
 		void retrieve_labels();
 		vector<string> label_to_name;
+		vector<ros::Time> label_last_time;
+		const ros::Duration welcome_wait_time = ros::Duration(30 * 60);
 	public:
 		string recognize_faces();
 		Face_Recognition(NodeHandle n);

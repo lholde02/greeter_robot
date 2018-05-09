@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
                 } else if (name != "noone") {
                         ROS_INFO("Hello %s\n!", name.c_str());
 			std::stringstream ss;
-			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcomemessages/welcome" <<  name << ".sh";
+			ss << "/home/turtlebot/catkin_ws/src/greeter_robot/data/welcomemessages/welcome.sh " <<  name;
 			string welcomepath = ss.str();
 			system(welcomepath.c_str());
 

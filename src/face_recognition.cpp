@@ -54,8 +54,15 @@ string Face_Recognition::recognize_faces() {
 
 		if (predictedLabel >= 0 && confidence > 3500) {
 			return "unknown"; // Confidence values above 3500 indicate that we do not recognize this face
-		} else if (predictedLabel >= 0) {
-			return label_to_name[predictedLabel].c_str();
+		} else if ( (predictedLabel >= 0)/* && (diff > welcome_wait_time)*/ ) { //TODO: AND WE HAVE NOT GREETED THEM IN THE PAST 30 SECONDS
+			ros::Time current_time = ros::Time::now();
+			ros::Duration diff = current_time - label_last_time[predictedLabel];
+			if ( diff > welcome_wait_time)  {
+			
+				label_last_time[predictedLabel] = ros::Time::now();
+				//TODO: UPDATE THEIR TIMESTAMP
+				return label_to_name[predictedLabel].c_str();
+			}
 		}
 		return "noone";
 }
@@ -87,6 +94,10 @@ void Face_Recognition::retrieve_labels() {
       getline(liness, name);
       if (!label.empty() && !name.empty()) {
         label_to_name.push_back(name); //Pushes the names in order
+	// This will reset the time labels every time the robot learns a new 
+	// person, so someone could be welcomed more than once every 30 minutes
+	// if the robot need to retrain for them or someone else.
+	label_last_time.push_back(ros::Time(0));
       }
     }
 }

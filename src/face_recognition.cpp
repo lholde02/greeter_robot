@@ -9,30 +9,36 @@ using namespace cv;
 using namespace std;
 
 /*
+* face_recognition.cpp
+* Class: Face_Recognition
+* Purpose: Implementation for the facial recognition node
+*/
+
+/*
 * read_csv uses the faces csv file to retrieve all of the images
 * it will need to train the classifier for facial recognition
 */
 void Face_Recognition::read_csv() {
   	std::ifstream file(fn_csv.c_str(), ifstream::in);
-    	if (!file) {
-    	    string error_message = "No valid input file was given, please check the given filename.";
-    	    CV_Error(CV_StsBadArg, error_message);
-    	}
-    	string line, path, classlabel;
-    	while (getline(file, line)) {
- 		stringstream liness(line);
- 		getline(liness, path, csv_separator);
- 		getline(liness, classlabel);
- 		if(!path.empty() && !classlabel.empty()) {
-			Mat img = imread(path, IMREAD_GRAYSCALE);
-			if (img.empty()) {
-				cout << path << "could not be read!" << endl;
-				exit(-1);
-		    	}
-	    		images.push_back(img);
-            		labels.push_back(atoi(classlabel.c_str()));
-       		}
-	}
+  	if (!file) {
+      string error_message = "No valid input file was given, please check the given filename.";
+      CV_Error(CV_StsBadArg, error_message);
+  	}
+  	string line, path, classlabel;
+  	while (getline(file, line)) {
+   		stringstream liness(line);
+   		getline(liness, path, csv_separator);
+   		getline(liness, classlabel);
+   		if(!path.empty() && !classlabel.empty()) {
+  			Mat img = imread(path, IMREAD_GRAYSCALE);
+  			if (img.empty()) {
+  				cout << path << "could not be read!" << endl;
+  				exit(-1);
+  		  }
+    		images.push_back(img);
+        labels.push_back(atoi(classlabel.c_str()));
+      }
+    }
 }
 
 /*
@@ -40,6 +46,7 @@ void Face_Recognition::read_csv() {
 * the classifier on it, if it finds a match with certainty above a reasonable
 * threshold it will report the name associated with the face it believes
 * it has seen
+* Returns a string containing the name of the person it recognizes or 'unknown'
 */
 string Face_Recognition::recognize_faces() {
 		// Predict the face in an image with the confidence
@@ -58,15 +65,16 @@ string Face_Recognition::recognize_faces() {
 			ros::Time current_time = ros::Time::now();
 			ros::Duration diff = current_time - label_last_time[predictedLabel];
 			if ( diff > welcome_wait_time)  {
-			
 				label_last_time[predictedLabel] = ros::Time::now();
-				//TODO: UPDATE THEIR TIMESTAMP
 				return label_to_name[predictedLabel].c_str();
 			}
 		}
 		return "noone";
 }
 
+/*
+* Callback function for handling received images from face_detection
+*/
 void Face_Recognition::recognizer_callback(const sensor_msgs::Image::ConstPtr& msg) {
 		cv_bridge::CvImagePtr img;
 		img = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8); // container of type sensor_msgs/Image
@@ -83,8 +91,8 @@ void Face_Recognition::recognizer_callback(const sensor_msgs::Image::ConstPtr& m
 void Face_Recognition::retrieve_labels() {
     std::ifstream file(label_csv.c_str(), ifstream::in);
     if (!file) {
-        string error_message = "No valid labels.csv file found";
-        CV_Error(CV_StsBadArg, error_message);
+      string error_message = "No valid labels.csv file found";
+      CV_Error(CV_StsBadArg, error_message);
     }
     string line, label, name;
     label_to_name.clear();
@@ -93,11 +101,12 @@ void Face_Recognition::retrieve_labels() {
       getline(liness, label, csv_separator);
       getline(liness, name);
       if (!label.empty() && !name.empty()) {
-        label_to_name.push_back(name); //Pushes the names in order
-	// This will reset the time labels every time the robot learns a new 
-	// person, so someone could be welcomed more than once every 30 minutes
-	// if the robot need to retrain for them or someone else.
-	label_last_time.push_back(ros::Time(0));
+        label_to_name.push_back(name);
+        //Pushes the names in order
+      	// This will reset the time labels every time the robot learns a new
+      	// person, so someone could be welcomed more than once every 30 minutes
+      	// if the robot need to retrain for them or someone else.
+        label_last_time.push_back(ros::Time(0));
       }
     }
 }
@@ -121,8 +130,8 @@ Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
 
  		// Quit if there are not enough images.
    	if(images.size() <= 1) {
-        	string error_message = "This demo needs at least 2 images to work. Please add more images to your data set!";
-        	CV_Error(CV_StsError, error_message);
+    	string error_message = "This demo needs at least 2 images to work. Please add more images to your data set!";
+    	CV_Error(CV_StsError, error_message);
     }
   	// Get the height from the first image
   	height = images[0].rows;
@@ -136,8 +145,8 @@ Face_Recognition::Face_Recognition(NodeHandle n) : it(n) {
 * in the data directory and listed in the faces.csv file
 */
 void Face_Recognition::retrain() {
-	system("/home/turtlebot/catkin_ws/src/greeter_robot/data/retrain.sh");
-	read_csv();
-	retrieve_labels();
-	model->train(images, labels);
+  	system("/home/turtlebot/catkin_ws/src/greeter_robot/data/retrain.sh");
+  	read_csv();
+  	retrieve_labels();
+  	model->train(images, labels);
 }

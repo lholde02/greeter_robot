@@ -31,7 +31,9 @@ using namespace move_base_msgs;
 /*
 * face_detection.h
 * Class: Face_Detection
-* Purpose: Header file for the facial detection node
+* Purpose: Header file for the facial detection node, which searches for a face
+*          in a video stream and when instructed by facial recognition, will
+*          take a series of photos of a NEW face for the classifier to train on
 */
 class Face_Detection {
     private:

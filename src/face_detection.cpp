@@ -1,5 +1,6 @@
 #include "face_detection.h"
 
+/* Globals needed for the code from the friendly faces repository */
 bool idle = true;
 vector<pair<Rect, string>> prevFaces;
 cv::Mat frame;
@@ -16,32 +17,31 @@ cv::Mat frame;
 * for learning this face later.
 */
 IplImage* Face_Detection::cropImage(const IplImage *img, const CvRect region) {
-	ROS_DEBUG("In cropImage");
-	IplImage *imageTmp;
-	IplImage *imageRGB;
-	CvSize size;
-	size.height = img->height;
-	size.width = img->width;
+		IplImage *imageTmp;
+		IplImage *imageRGB;
+		CvSize size;
+		size.height = img->height;
+		size.width = img->width;
 
-	if (img->depth != IPL_DEPTH_8U) {
-		ROS_INFO("ERROR in cropImage: Unknown image depth of %d given in cropImage() instead of 8 bits per pixel.", img->depth);
-		exit(1);
-	}
+		if (img->depth != IPL_DEPTH_8U) {
+			ROS_INFO("ERROR in cropImage: Unknown image depth of %d given in cropImage() instead of 8 bits per pixel.", img->depth);
+			exit(1);
+		}
 
-	// First create a new (color or greyscale) IPL Image and copy contents of img into it.
-	imageTmp = cvCreateImage(size, IPL_DEPTH_8U, img->nChannels);
-	cvCopy(img, imageTmp, NULL);
+		// First create a new (color or greyscale) IPL Image and copy contents of img into it.
+		imageTmp = cvCreateImage(size, IPL_DEPTH_8U, img->nChannels);
+		cvCopy(img, imageTmp, NULL);
 
-	// Create a new image of the detected region
-	// Set region of interest to that surrounding the face
-	cvSetImageROI(imageTmp, region);
-	// Copy region of interest (i.e. face) into a new iplImage (imageRGB) and return it
-	size.width = region.width;
-	size.height = region.height;
-	imageRGB = cvCreateImage(size, IPL_DEPTH_8U, img->nChannels);
-	cvCopy(imageTmp, imageRGB, NULL);	// Copy just the region.
-  cvReleaseImage( &imageTmp ); // Free up memory
-	return imageRGB;
+		// Create a new image of the detected region
+		// Set region of interest to that surrounding the face
+		cvSetImageROI(imageTmp, region);
+		// Copy region of interest (i.e. face) into a new iplImage (imageRGB) and return it
+		size.width = region.width;
+		size.height = region.height;
+		imageRGB = cvCreateImage(size, IPL_DEPTH_8U, img->nChannels);
+		cvCopy(imageTmp, imageRGB, NULL);	// Copy just the region.
+	  cvReleaseImage( &imageTmp ); // Free up memory
+		return imageRGB;
 }
 
 /*
@@ -49,17 +49,19 @@ IplImage* Face_Detection::cropImage(const IplImage *img, const CvRect region) {
 * is required before we can train our classifier on this image
 */
 Mat Face_Detection::preProcessImage(Mat frame) {
-        cv::Mat frame_gray;
-        cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
-        cv::equalizeHist( frame_gray, frame_gray );
-	return frame_gray;
+	  cv::Mat frame_gray;
+	  cv::cvtColor( frame, frame_gray, CV_BGR2GRAY );
+	  cv::equalizeHist( frame_gray, frame_gray );
+		return frame_gray;
 }
 
 /*
-
+* Handles a large portion of functionality for facial detection, makes sure
+* that each face detected also has at least one eye, does preprocessing,
+* calls other functions to do more preprocessing, and displays the results
 */
 void Face_Detection::detectAndDisplay( Mat frame ) {
-	frame = preProcessImage(frame);
+		frame = preProcessImage(frame);
 
   	// Detect Faces
   	std::vector<cv::Rect> faces;
@@ -151,6 +153,11 @@ void Face_Detection::callback(const sensor_msgs::ImageConstPtr& msg) {
 	detectAndDisplay(cv_ptr->image.clone());
 }
 
+/*
+* Callback function that gets called when this class receives a message
+* from the face recognition node indicating that we need to take a certain
+* number of photos for the classifier to be trained on for a NEW person
+*/
 void Face_Detection::recognitionCallback(const std_msgs::String::ConstPtr& msg) {
 	face_name = msg->data.c_str();
 	num_training_images = MAX_COUNT;
@@ -183,6 +190,9 @@ Face_Detection::Face_Detection(NodeHandle& nh, int argc, char** argv) : it(nh) {
 Face_Detection::~Face_Detection() {
 }
 
+/*
+* Extracted from friendly faces' code
+*/
 void Face_Detection::_idle() {
 	if (lastIdle == -1 || Time::now().toSec() - lastIdle > 1) {
 		lastIdle = Time::now().toSec();
@@ -191,6 +201,9 @@ void Face_Detection::_idle() {
 	}
 }
 
+/*
+* Extracted from friendly faces' code
+*/
 void Face_Detection::_kill_idle() {
 		lastIdle = -1;
 		first = true;
@@ -202,11 +215,13 @@ void Face_Detection::_kill_idle() {
 		}
 }
 
+// Sets some variables up in order to collect training imgs
 void Face_Detection::collect_training_faces(string name) {
 	face_name = name;
 	count = MAX_COUNT;
 }
 
+// Returns the number of training images we need to collect
 int Face_Detection::num_training_images_to_collect() {
 	return num_training_images;
 }

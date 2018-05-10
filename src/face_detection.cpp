@@ -91,6 +91,7 @@ void Face_Detection::detectAndDisplay( Mat frame ) {
 				Mat small_img;
 				resize(face_img, small_img, Size(100, 100));
 				// If num_training_images > 0, save the faces under the name, and decrement the counter
+				ROS_INFO("num_training_images to collect %i\n", num_training_images);
 				if (num_training_images > 0) {
 					num_training_images = num_training_images - 1;
 					//Check if the person's folder exists already
@@ -98,21 +99,22 @@ void Face_Detection::detectAndDisplay( Mat frame ) {
 					if ( !(stat((data_folder+face_name).c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))) {
 						//If the folder does not exist already, make a folder
 						mkdir((data_folder + face_name).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-					}  else if (face_pic_num == 0) {
-						//Folder exists, so it might have files in it we dont want to overwite, so we must count the files in it
-						DIR *dp;
-						struct dirent *ep;
-						dp = opendir( (data_folder + face_name).c_str());
-						while (ep = readdir (dp))
-							face_pic_num++;
-						(void) closedir(dp);
 					}
+						
+					//Folder exists, so it might have files in it we dont want to overwite, so we must count the files in it
+					face_pic_num = 0;
+					DIR *dp;
+					struct dirent *ep;
+					dp = opendir( (data_folder + face_name).c_str());
+					while (ep = readdir (dp))
+						face_pic_num++;
+					(void) closedir(dp);
 					//Save croped image to faces data in their folder
 					//ensure sequential naming of photos,
 					//even if there are already photos in the folder
 					String image_name = data_folder + face_name + "/" + std::to_string(face_pic_num) + ".pgm";
-					face_pic_num = face_pic_num + 1;
 					imwrite(image_name, small_img);//save image
+					ROS_INFO("wrote %s", image_name.c_str());				
 				}
 
 				//Publisher: will publish Mat images in a sensor_msg::Image format, must be converted back on recieving end
@@ -124,12 +126,11 @@ void Face_Detection::detectAndDisplay( Mat frame ) {
 				detection_pub.publish(msg);
 				ros::spinOnce();
 				count++;
-			}
-  	}
-
-	// Display Results
-  	imshow( "test", frame );
-  	waitKey(10);
+  			}
+		}
+		// Display Results
+  		imshow( "test", frame );
+ 		waitKey(10);
  }
 
 /*
@@ -168,6 +169,9 @@ void Face_Detection::recognitionCallback(const std_msgs::String::ConstPtr& msg) 
 * Handles subscribing and publishing to the necessary topics
 */
 Face_Detection::Face_Detection(NodeHandle& nh, int argc, char** argv) : it(nh) {
+	face_name = "";
+	num_training_images = 0;
+
 	//Subscribe to face recognition data
 	ros::init(argc, argv, "recognition_listener");
 	recognition_sub = nh.subscribe("face_recognition", 1, &Face_Detection::recognitionCallback, this);
@@ -177,7 +181,6 @@ Face_Detection::Face_Detection(NodeHandle& nh, int argc, char** argv) : it(nh) {
 	image_sub = it.subscribe("/camera/rgb/image_raw", 1, &Face_Detection::callback, this);
 	count = 0;
 
-	face_name = "";
 	face_cascade.load( face_cascade_name );
 	eyes_cascade.load( eyes_cascade_name );
 
@@ -213,12 +216,6 @@ void Face_Detection::_kill_idle() {
 		if (killed) {
 			return;
 		}
-}
-
-// Sets some variables up in order to collect training imgs
-void Face_Detection::collect_training_faces(string name) {
-	face_name = name;
-	count = MAX_COUNT;
 }
 
 // Returns the number of training images we need to collect

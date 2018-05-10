@@ -59,9 +59,9 @@ string Face_Recognition::recognize_faces() {
 			fresh_face = false;
 		}
 
-		if (predictedLabel >= 0 && confidence > 3500) {
-			return "unknown"; // Confidence values above 3500 indicate that we do not recognize this face
-		} else if ( (predictedLabel >= 0)/* && (diff > welcome_wait_time)*/ ) { //TODO: AND WE HAVE NOT GREETED THEM IN THE PAST 30 SECONDS
+		if (predictedLabel >= 0 && confidence > 3000) {
+			return "unknown"; // Confidence values above 3000 indicate that we do not recognize this face
+		} else if (predictedLabel >= 0  { 
 			ros::Time current_time = ros::Time::now();
 			ros::Duration diff = current_time - label_last_time[predictedLabel];
 			if ( diff > welcome_wait_time)  {
